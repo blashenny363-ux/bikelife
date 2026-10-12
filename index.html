@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Pitbike Stunt</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+    position: fixed;
+}
+
+.btn {
+    background: #000;
+    border: 3px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    text-shadow: 1px 1px 3px #000;
+    letter-spacing: 2px;
+    transition: transform 0.05s, background 0.1s, border-color 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.btn:active, .btn.pressed {
+    background: #222;
+    transform: scale(0.96);
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 50;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ============================================================
+   ЭКРАН ЗАГРУЗКИ
+   ============================================================ */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#loading-wheel {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+    animation: spinWheel 1s linear infinite;
+}
+
+@keyframes spinWheel {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+#loading-progress-container {
+    width: 60%;
+    max-width: 300px;
+    height: 20px;
+    background: #000;
+    border: 3px solid #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+#loading-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #fff;
+    transition: width 0.15s linear;
+}
+
+#loading-text {
+    color: #fff;
+    font-size: 16px;
+    margin-top: 15px;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+#loading-percent {
+    color: #fff;
+    font-size: 14px;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   МЕНЮ
+   ============================================================ */
+#menu-screen {
+    background: #000;
+    overflow: hidden;
+}
+
+#menu-bg {
+    position: absolute;
+    top: -5%;
+    left: -10%;
+    width: 120%;
+    height: 110%;
+    object-fit: cover;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 1;
+    animation: floatBg 12s ease-in-out infinite;
+}
+
+@keyframes floatBg {
+    0%   { transform: translateX(0) scale(1.0); }
+    50%  { transform: translateX(-3%) scale(1.03); }
+    100% { transform: translateX(0) scale(1.0); }
+}
+
+#menu-bg-overlay {
+    position: absolute;
+    top: -5%;
+    left: -10%;
+    width: 120%;
+    height: 110%;
+    object-fit: cover;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 2;
+    animation: floatBg2 18s ease-in-out infinite;
+    filter: blur(2px);
+}
+
+@keyframes floatBg2 {
+    0%   { transform: translateX(0) scale(1.05); }
+    50%  { transform: translateX(3%) scale(1.0); }
+    100% { transform: translateX(0) scale(1.05); }
+}
+
+#menu-title {
+    position: absolute;
+    top: 15%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-family: 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive;
+    font-style: italic;
+    font-weight: 900;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8), 3px 3px 6px #000;
+    letter-spacing: 3px;
+    line-height: 1.05;
+    pointer-events: none;
+    z-index: 5;
+    animation: titlePulse 2.5s infinite;
+}
+
+@keyframes titlePulse {
+    0%   { transform: rotate(-3deg) scale(1.0); }
+    85%  { transform: rotate(-3deg) scale(1.15); }
+    86%  { transform: rotate(-3deg) scale(0.95); }
+    100% { transform: rotate(-3deg) scale(1.0); }
+}
+
+#menu-title .line1 {
+    font-size: 64px;
+    display: block;
+    color: #fff;
+    font-weight: 900;
+}
+
+#menu-title .line2 {
+    font-size: 52px;
+    display: block;
+    color: #ffcc00;
+    text-shadow: 0 0 20px rgba(255,204,0,0.8), 3px 3px 6px #000;
+    transform: rotate(2deg);
+    margin-left: 25px;
+    font-weight: 900;
+}
+
+#menu-title .line3 {
+    font-size: 44px;
+    display: block;
+    color: #00ccff;
+    text-shadow: 0 0 20px rgba(0,204,255,0.8), 3px 3px 6px #000;
+    transform: rotate(-2deg);
+    margin-left: 80px;
+    font-weight: 900;
+}
+
+#menu-buttons {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 0 20px;
+    z-index: 10;
+}
+
+#menu-buttons .btn {
+    width: 240px;
+    height: 70px;
+    font-size: 22px;
+}
+
+/* ============================================================
+   МАГАЗИН
+   ============================================================ */
+#shop-screen {
+    background: #000;
+}
+
+#shop-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#shop-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 5;
+}
+
+#shop-balance {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    background: #000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 3px solid #333;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+#shop-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    padding: 0;
+    z-index: 10;
+    background: #000;
+    border-color: #333;
+    color: #fff;
+}
+
+#bike-carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    flex: 1;
+}
+
+.nav-arrow {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    flex-shrink: 0;
+    background: #000;
+    border-color: #333;
+    color: #fff;
+}
+
+.nav-arrow:disabled {
+    opacity: 0.2;
+}
+
+#bike-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+}
+
+#shop-bike-preview {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#shop-bike-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+    transition: opacity 0.2s;
+    position: relative;
+    z-index: 2;
+}
+
+.shop-wheel {
+    position: absolute;
+    display: none;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shop-wheel.visible {
+    display: block;
+}
+
+#shop-question {
+    display: none;
+    width: 200px;
+    height: 200px;
+    font-size: 180px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    line-height: 200px;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 30px rgba(255,255,255,0.6);
+    z-index: 3;
+}
+
+#shop-question.visible {
+    display: block;
+}
+
+#shop-bike-name {
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 15px;
+    text-shadow: 0 0 10px #fff;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+#shop-bike-speed {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+#shop-bike-status {
+    color: #aaa;
+    font-size: 16px;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+#shop-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0 20px 20px 20px;
+    max-width: 400px;
+}
+
+#shop-actions .btn {
+    width: 100%;
+    max-width: 280px;
+    height: 60px;
+    font-size: 18px;
+}
+
+#btn-buy {
+    background: #000;
+    border-color: #333;
+    color: #fff;
+}
+
+#btn-buy:active {
+    background: #222;
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+#btn-select {
+    border-color: #333;
+    color: #fff;
+}
+
+#btn-select:active {
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+/* ============================================================
+   ИГРА
+   ============================================================ */
+#game-screen {
+    background: #000;
+}
+
+#game-canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+#speedometer, #distance {
+    position: fixed;
+    color: #fff;
+    font-weight: bold;
+    background: #000;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+    z-index: 10;
+    pointer-events: none;
+    letter-spacing: 1px;
+}
+
+#speedometer {
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+}
+
+#distance {
+    top: 12px;
+    left: 12px;
+    font-size: 16px;
+}
+
+#btn-pause {
+    position: fixed;
+    top: 55px;
+    right: 12px;
+    width: 60px;
+    height: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    z-index: 10;
+    padding-left: 6px;
+}
+
+#stunt-earnings {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    background: #000;
+    padding: 8px 20px;
+    border-radius: 10px;
+    border: 3px solid #333;
+    text-shadow: 0 0 12px rgba(255,255,255,0.7);
+    letter-spacing: 1px;
+    z-index: 15;
+    pointer-events: none;
+    display: none;
+    font-family: Arial, sans-serif;
+}
+
+#stunt-earnings.visible {
+    display: block;
+}
+
+#btn-bass {
+    position: fixed;
+    right: 18px;
+    bottom: 200px;
+    width: 80px;
+    height: 80px;
+    font-size: 11px;
+    z-index: 20;
+    display: none;
+    background: #000;
+    border-color: #333;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+}
+
+#btn-bass.visible {
+    display: flex;
+}
+
+#btn-bass:active, #btn-bass.pressed {
+    background: #222;
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+#btn-bass.active-bass {
+    background: #222;
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.6);
+    animation: bassPulse 0.8s infinite alternate;
+}
+
+@keyframes bassPulse {
+    from { box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+    to   { box-shadow: 0 0 30px rgba(255,255,255,0.7); }
+}
+
+#btn-clutch {
+    position: fixed;
+    right: 18px;
+    bottom: 200px;
+    width: 80px;
+    height: 80px;
+    font-size: 11px;
+    z-index: 20;
+    display: none;
+    background: #000;
+    border-color: #333;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+}
+
+#btn-clutch.visible {
+    display: flex;
+}
+
+#btn-clutch:active, #btn-clutch.pressed {
+    background: #222;
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+/* КНОПКА "1" (для велосипеда SPEEDONE) — тап, не зажим */
+#btn-trick {
+    position: fixed;
+    right: 18px;
+    bottom: 200px;
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 20;
+    display: none;
+    background: #000;
+    border-color: #333;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+}
+
+#btn-trick.visible {
+    display: flex;
+}
+
+#btn-trick:active, #btn-trick.pressed {
+    background: #222;
+    border-color: #666;
+    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+}
+
+#btn-trick.active-trick {
+    background: #222;
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 30px rgba(255,255,255,0.9);
+}
+
+#btn-brake {
+    position: fixed;
+    right: 18px;
+    bottom: 110px;
+    width: 80px;
+    height: 80px;
+    font-size: 12px;
+    z-index: 20;
+}
+
+#btn-gas {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 80px;
+    height: 80px;
+    font-size: 12px;
+    z-index: 20;
+    overflow: hidden;
+    padding: 0;
+    display: block;
+    background: #000;
+    border: 3px solid #333;
+    border-radius: 10px;
+}
+
+#gas-zone-high {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+    z-index: 3;
+    border-bottom: 2px solid #333;
+    letter-spacing: 1px;
+    background: transparent;
+}
+
+#gas-zone-low {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+    z-index: 3;
+    letter-spacing: 1px;
+    background: transparent;
+}
+
+#gas-zone-high.pressed {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#gas-zone-low.pressed {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#gas-fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+    background: rgba(255, 100, 0, 0.3);
+    z-index: 1;
+    transition: height 0.05s linear;
+    pointer-events: none;
+}
+
+/* ============================================================
+   ПАУЗА
+   ============================================================ */
+#pause-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+#pause-screen.active {
+    display: flex;
+}
+
+#pause-screen h2 {
+    font-size: 42px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #fff;
+    letter-spacing: 3px;
+}
+
+#pause-earnings {
+    font-size: 26px;
+    color: #fff;
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px rgba(255,255,255,0.7);
+    letter-spacing: 1px;
+    background: #000;
+    padding: 10px 25px;
+    border-radius: 10px;
+    border: 3px solid #333;
+}
+
+#pause-screen .btn {
+    width: 220px;
+    height: 60px;
+    font-size: 18px;
+    margin-top: 15px;
+}
+
+/* ============================================================
+   GAME OVER
+   ============================================================ */
+#gameover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+#gameover.active {
+    display: flex;
+}
+
+#gameover h1 {
+    font-size: 42px;
+    color: #fff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #fff;
+    letter-spacing: 3px;
+}
+
+#gameover p {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+#gameover .money-earned {
+    font-size: 26px;
+    color: #fff;
+    margin: 20px 0;
+    text-shadow: 0 0 15px rgba(255,255,255,0.7);
+}
+
+#gameover .btn {
+    margin-top: 15px;
+    width: 220px;
+    height: 60px;
+    font-size: 18px;
+}
+
+@media (orientation: landscape) {
+    #loading-wheel { width: 80px; height: 80px; margin-bottom: 25px; }
+    #loading-progress-container { height: 16px; }
+    #btn-bass { width: 70px; height: 70px; font-size: 10px; right: 12px; bottom: 182px; }
+    #btn-clutch { width: 70px; height: 70px; font-size: 10px; right: 12px; bottom: 182px; }
+    #btn-trick { width: 70px; height: 70px; font-size: 22px; right: 12px; bottom: 182px; }
+    #btn-brake { width: 70px; height: 70px; font-size: 11px; right: 12px; bottom: 92px; }
+    #btn-gas { width: 70px; height: 70px; right: 12px; bottom: 12px; }
+    #gas-zone-high, #gas-zone-low { font-size: 9px; }
+    #speedometer { font-size: 16px; }
+    #distance { font-size: 14px; }
+    #btn-pause { width: 52px; height: 44px; font-size: 20px; top: 50px; right: 12px; }
+    #stunt-earnings { font-size: 20px; padding: 6px 16px; }
+    #pause-earnings { font-size: 22px; padding: 8px 20px; }
+    #shop-bike-preview { max-width: 240px; }
+    #shop-bike-name { font-size: 18px; }
+    #shop-question { width: 150px; height: 150px; font-size: 130px; line-height: 150px; }
+    #menu-title .line1 { font-size: 48px; }
+    #menu-title .line2 { font-size: 40px; }
+    #menu-title .line3 { font-size: 32px; }
+    #menu-buttons .btn { width: 200px; height: 60px; font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ЭКРАН ЗАГРУЗКИ -->
+<div id="loading-screen">
+    <img id="loading-wheel" src="wheel_bike.png" alt="">
+    <div id="loading-progress-container">
+        <div id="loading-progress-bar"></div>
+    </div>
+    <div id="loading-text">ЗАГРУЗКА...</div>
+    <div id="loading-percent">0%</div>
+</div>
+
+<!-- МЕНЮ -->
+<div id="menu-screen" class="screen">
+    <img id="menu-bg" src="menu.png" alt="">
+    <img id="menu-bg-overlay" src="menu.png" alt="">
+    
+    <div id="menu-title">
+        <span class="line1">russia</span>
+        <span class="line2">bike life</span>
+        <span class="line3">2D</span>
+    </div>
+    
+    <div id="menu-buttons">
+        <button id="btn-play" class="btn">ИГРАТЬ</button>
+        <button id="btn-shop" class="btn">МАГАЗИН</button>
+    </div>
+</div>
+
+<!-- МАГАЗИН -->
+<div id="shop-screen" class="screen">
+    <img id="shop-bg" src="menu.png" alt="">
+    <div id="shop-content">
+        <button id="shop-back" class="btn">←</button>
+        <div id="shop-balance">0 ₽</div>
+
+        <div id="bike-carousel">
+            <button id="prev-bike" class="btn nav-arrow">‹</button>
+            <div id="bike-display">
+                <div id="shop-bike-preview">
+                    <img class="shop-wheel" id="shop-wheel-rear" src="wheel_bike.png" alt="">
+                    <img class="shop-wheel" id="shop-wheel-front-bike" src="wheel_bike.png" alt="">
+                    <img class="shop-wheel" id="shop-wheel-front" src="wheel_bike7.png" alt="">
+                    <img class="shop-wheel" id="shop-wheel-back" src="wheel_bike7.png" alt="">
+                    <div id="shop-question">?</div>
+                    <img id="shop-bike-img" src="bike.png" alt="">
+                </div>
+                <div id="shop-bike-name">BSE</div>
+                <div id="shop-bike-speed">Макс: 100 км/ч</div>
+                <div id="shop-bike-status">Куплен</div>
+            </div>
+            <button id="next-bike" class="btn nav-arrow">›</button>
+        </div>
+
+        <div id="shop-actions">
+            <button id="btn-buy" class="btn">КУПИТЬ — 110 000 ₽</button>
+            <button id="btn-select" class="btn">ВЫБРАТЬ</button>
+        </div>
+    </div>
+</div>
+
+<!-- ИГРА -->
+<div id="game-screen" class="screen">
+    <canvas id="game-canvas"></canvas>
+    <div id="speedometer">0 км/ч</div>
+    <div id="distance">0 м</div>
+    <div id="stunt-earnings">+0 ₽</div>
+    <button id="btn-pause" class="btn">| |</button>
+    <button id="btn-bass" class="btn">МУЗЫКА</button>
+    <button id="btn-clutch" class="btn">СЦЕПА</button>
+    <button id="btn-trick" class="btn">1</button>
+    <button id="btn-brake" class="btn">ТОРМОЗ</button>
+    
+    <div id="btn-gas">
+        <div id="gas-fill"></div>
+        <div id="gas-zone-high">ГАЗ</div>
+        <div id="gas-zone-low">ДЕРЖАТЬ</div>
+    </div>
+</div>
+
+<!-- ПАУЗА -->
+<div id="pause-screen">
+    <h2>ПАУЗА</h2>
+    <div id="pause-earnings">Заработано: 0 ₽</div>
+    <button id="btn-resume" class="btn">ПРОДОЛЖИТЬ</button>
+    <button id="btn-pause-menu" class="btn">В МЕНЮ</button>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover">
+    <h1>УПАЛ</h1>
+    <p id="final-distance">Пройдено: 0 м</p>
+    <p id="final-angle">Макс. угол: 0°</p>
+    <div class="money-earned" id="final-money">+0 ₽</div>
+    <button id="btn-restart" class="btn">ЗАНОВО</button>
+    <button id="btn-menu" class="btn">В МЕНЮ</button>
+</div>
+
+<script>
+// ============================================================
+// ДАННЫЕ
+// ============================================================
+const BIKES = [
+    {
+        id: 'stock', name: 'BSE', image: 'bike.png', price: 0, maxSpeed: 100, speedMultiplier: 1.0,
+        engineSound: 'default', backgroundSound: 'default', type: 'bike',
+        acceleration: 0.005,
+        hasWheels: true,
+        wheelImage: 'wheel_bike.png',
+        rearWheelX: 0.18, rearWheelY: 0.82, rearWheelRadius: 0.14,
+        frontWheelX: 0.82, frontWheelY: 0.82, frontWheelRadius: 0.14
+    },
+    {
+        id: 'bike2', name: 'PROGASI', image: 'bike2.png', price: 110000, maxSpeed: 120, speedMultiplier: 1.15,
+        engineSound: 'default', backgroundSound: 'default', type: 'bike',
+        acceleration: 0.005,
+        hasWheels: true,
+        wheelImage: 'wheel_bike.png',
+        rearWheelX: 0.18, rearWheelY: 0.82, rearWheelRadius: 0.14,
+        frontWheelX: 0.82, frontWheelY: 0.82, frontWheelRadius: 0.14
+    },
+    {
+        id: 'bike3', name: 'KAYO', image: 'bike3.png', price: 70000, maxSpeed: 140,
+        speedMultiplier: 1.037,
+        engineSound: 'default', backgroundSound: 'default', type: 'bike',
+        acceleration: 0.006,
+        hasWheels: true,
+        wheelImage: 'wheel_bike.png',
+        rearWheelX: 0.18, rearWheelY: 0.82, rearWheelRadius: 0.14,
+        frontWheelX: 0.82, frontWheelY: 0.82, frontWheelRadius: 0.14
+    },
+    {
+        id: 'bike4', name: 'ALPHA', image: 'bike4.png', price: 50000, maxSpeed: 110, speedMultiplier: 1.1,
+        engineSound: 'default', backgroundSound: 'default', type: 'bike',
+        acceleration: 0.005,
+        hasWheels: true,
+        wheelImage: 'wheel_bike.png',
+        rearWheelX: 0.18, rearWheelY: 0.82, rearWheelRadius: 0.14,
+        frontWheelX: 0.82, frontWheelY: 0.82, frontWheelRadius: 0.14
+    },
+    {
+        id: 'bike5', name: 'KUKIRIN', image: 'bike5.png', price: 40000, maxSpeed: 70, speedMultiplier: 0.7,
+        engineSound: 'none', backgroundSound: 'none', type: 'scooter',
+        acceleration: 0.035,
+        hasWheels: false
+    },
+    {
+        id: 'bike6', name: 'SPEEDONE', image: 'bike6.png', price: 15000, maxSpeed: 40, speedMultiplier: 0.4,
+        engineSound: 'none', backgroundSound: 'none', type: 'bicycle',
+        acceleration: 0.02,
+        hasWheels: true,
+        wheelImage: 'wheel_bike6.png',
+        rearWheelX: 0.18, rearWheelY: 0.82, rearWheelRadius: 0.14,
+        frontWheelX: 0.82, frontWheelY: 0.82, frontWheelRadius: 0.14,
+        trickImage: 'bike6_1.png'
+    },
+    {
+        id: 'bike7', name: 'БПАН КОРЫТО', image: 'bike7.png', price: 20000, maxSpeed: 150, speedMultiplier: 1.11,
+        engineSound: 'car7', backgroundSound: 'none', type: 'car',
+        acceleration: 0.005,
+        wheelImage: 'wheel_bike7.png',
+        wheelFrontX: 0.88, wheelFrontY: 0.82, wheelBackX: 0.10, wheelBackY: 0.82,
+        wheelRadius: 0.075, bodyOffsetY: 0.22, bodyScaleX: 1.25, bodyScaleY: 0.42,
+        hideImage: true
+    }
+];
+
+const ASSETS = {
+    background: 'background.png',
+    engine: 'sound.mp3',
+    engineStunt: 'sound_stunt.mp3',
+    engineCar: 'sound7.mp3',
+    backgroundSound: 'background_sound.mp3',
+    menuSound: 'menu_sound.mp3',
+    bike7Sound: 'bike7.mp3',
+    crash: '',
+    menu: 'menu.png'
+};
+
+// ============================================================
+// СОХРАНЕНИЕ
+// ============================================================
+const SAVE_KEY = 'pitbike_save_v4';
+let save = { money: 0, ownedBikes: ['stock'], selectedBike: 'stock' };
+
+function loadSave() {
+    try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (raw) {
+            const data = JSON.parse(raw);
+            if (data.money !== undefined) save.money = data.money;
+            if (data.ownedBikes) save.ownedBikes = data.ownedBikes;
+            if (data.selectedBike) save.selectedBike = data.selectedBike;
+        }
+    } catch (e) {}
+}
+function persistSave() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
+}
+loadSave();
+
+// ============================================================
+// CANVAS
+// ============================================================
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    updateBikePosition();
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+
+// ============================================================
+// ЗАГРУЗКА КАРТИНОК С ПРОГРЕССОМ
+// ============================================================
+const images = { bike: null, wheel: null, bikeWheel: null, background: null, trick: null };
+
+// Список всех картинок для предзагрузки
+const PRELOAD_IMAGES = [
+    // Фоны и меню
+    'menu.png', 'background.png',
+    // Байки
+    'bike.png', 'bike2.png', 'bike3.png', 'bike4.png', 'bike5.png', 'bike6.png', 'bike6_1.png', 'bike7.png',
+    // Колёса
+    'wheel_bike.png', 'wheel_bike6.png', 'wheel_bike7.png'
+];
+
+let loadingTotal = PRELOAD_IMAGES.length;
+let loadingLoaded = 0;
+
+const loadingBar = document.getElementById('loading-progress-bar');
+const loadingPercent = document.getElementById('loading-percent');
+const loadingScreen = document.getElementById('loading-screen');
+
+function updateLoadingProgress() {
+    const percent = Math.floor((loadingLoaded / loadingTotal) * 100);
+    loadingBar.style.width = percent + '%';
+    loadingPercent.textContent = percent + '%';
+}
+
+function preloadAllImages() {
+    PRELOAD_IMAGES.forEach(src => {
+        const img = new Image();
+        img.onload = () => {
+            loadingLoaded++;
+            updateLoadingProgress();
+            if (loadingLoaded >= loadingTotal) {
+                // Всё загружено — скрываем экран загрузки
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    // Показываем меню
+                    showScreen('menu-screen');
+                }, 400);
+            }
+        };
+        img.onerror = () => {
+            console.warn('Не загрузилось:', src);
+            loadingLoaded++;
+            updateLoadingProgress();
+            if (loadingLoaded >= loadingTotal) {
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    showScreen('menu-screen');
+                }, 400);
+            }
+        };
+        img.src = src;
+    });
+}
+
+// ============================================================
+// ЗВУК
+// ============================================================
+let engineSound = null;
+let engineStuntSound = null;
+let engineCarSound = null;
+let backgroundSound = null;
+let crashSound = null;
+let menuSound = null;
+let bike7Sound = null;
+let soundReady = false;
+let menuSoundPlaying = false;
+let bassPlaying = false;
+
+let currentEngineSound = 'default';
+let currentBackgroundSound = 'default';
+
+function initSound() {
+    if (soundReady) return;
+    soundReady = true;
+
+    if (ASSETS.menuSound) {
+        menuSound = new Audio(ASSETS.menuSound);
+        menuSound.loop = true;
+        menuSound.volume = 0.5;
+        menuSound.preload = 'auto';
+    }
+    if (ASSETS.backgroundSound) {
+        backgroundSound = new Audio(ASSETS.backgroundSound);
+        backgroundSound.loop = true;
+        backgroundSound.volume = 0.25;
+        backgroundSound.preload = 'auto';
+    }
+    if (ASSETS.engine) {
+        engineSound = new Audio(ASSETS.engine);
+        engineSound.loop = true;
+        engineSound.volume = 0.5;
+        engineSound.preload = 'auto';
+    }
+    if (ASSETS.engineStunt) {
+        engineStuntSound = new Audio(ASSETS.engineStunt);
+        engineStuntSound.loop = true;
+        engineStuntSound.volume = 0.5;
+        engineStuntSound.preload = 'auto';
+    }
+    if (ASSETS.engineCar) {
+        engineCarSound = new Audio(ASSETS.engineCar);
+        engineCarSound.loop = true;
+        engineCarSound.volume = 0.5;
+        engineCarSound.preload = 'auto';
+    }
+    if (ASSETS.bike7Sound) {
+        bike7Sound = new Audio(ASSETS.bike7Sound);
+        bike7Sound.loop = true;
+        bike7Sound.volume = 0.6;
+        bike7Sound.preload = 'auto';
+    }
+    if (ASSETS.crash) {
+        crashSound = new Audio(ASSETS.crash);
+        crashSound.volume = 0.7;
+    }
+    
+    startMenuSound();
+}
+
+// ============================================================
+// МУЗЫКА МЕНЮ
+// ============================================================
+function startMenuSound() {
+    if (!menuSound) return;
+    if (menuSoundPlaying && !menuSound.paused) return;
+    menuSoundPlaying = true;
+    menuSound.volume = 0.5;
+    menuSound.play().catch(() => { menuSoundPlaying = false; });
+}
+
+let menuFadeInterval = null;
+function fadeOutMenuSound(duration = 1200) {
+    if (!menuSound) return;
+    menuSoundPlaying = false;
+    if (menuFadeInterval) clearInterval(menuFadeInterval);
+    const steps = 30;
+    const stepTime = duration / steps;
+    const startVolume = menuSound.volume;
+    let step = 0;
+    menuFadeInterval = setInterval(() => {
+        step++;
+        const newVolume = startVolume * (1 - step / steps);
+        if (newVolume <= 0 || step >= steps) {
+            menuSound.volume = 0;
+            menuSound.pause();
+            menuSound.currentTime = 0;
+            menuSound.volume = 0.5;
+            clearInterval(menuFadeInterval);
+            menuFadeInterval = null;
+        } else {
+            menuSound.volume = newVolume;
+        }
+    }, stepTime);
+}
+
+// ============================================================
+// ЗВУК ГАЗА
+// ============================================================
+let engineFadeInterval = null;
+let engineFadeStuntInterval = null;
+let engineFadeCarInterval = null;
+const ENGINE_MAX_VOLUME = 0.5;
+let activeEngineSound = null;
+
+function playEngine() {
+    if (currentEngineSound === 'none') return;
+    
+    if (currentEngineSound === 'car7') {
+        if (!engineCarSound) return;
+        if (engineFadeCarInterval) { clearInterval(engineFadeCarInterval); engineFadeCarInterval = null; }
+        if (engineSound && !engineSound.paused) { engineSound.pause(); engineSound.currentTime = 0; }
+        if (engineStuntSound && !engineStuntSound.paused) { engineStuntSound.pause(); engineStuntSound.currentTime = 0; }
+        
+        engineCarSound.currentTime = 0;
+        engineCarSound.volume = ENGINE_MAX_VOLUME;
+        engineCarSound.play().catch(() => {});
+        activeEngineSound = 'car';
+    } else {
+        if (!engineSound) return;
+        if (engineFadeInterval) { clearInterval(engineFadeInterval); engineFadeInterval = null; }
+        if (engineStuntSound && !engineStuntSound.paused) { engineStuntSound.pause(); engineStuntSound.currentTime = 0; }
+        
+        if (engineSound.paused) {
+            engineSound.currentTime = 0;
+            engineSound.play().catch(() => {});
+        }
+        engineSound.volume = ENGINE_MAX_VOLUME;
+        activeEngineSound = 'normal';
+    }
+}
+
+function playEngineStunt() {
+    if (currentEngineSound === 'none') return;
+    if (currentEngineSound === 'car7') { playEngine(); return; }
+    if (!engineStuntSound) { playEngine(); return; }
+    
+    if (engineSound && !engineSound.paused) {
+        engineSound.pause();
+        engineSound.currentTime = 0;
+    }
+    if (engineFadeStuntInterval) { clearInterval(engineFadeStuntInterval); engineFadeStuntInterval = null; }
+    
+    if (engineStuntSound.paused) {
+        engineStuntSound.currentTime = 0;
+        engineStuntSound.play().catch(() => {});
+    }
+    engineStuntSound.volume = ENGINE_MAX_VOLUME;
+    activeEngineSound = 'stunt';
+}
+
+function pauseEngineImmediate() {
+    if (engineFadeInterval) { clearInterval(engineFadeInterval); engineFadeInterval = null; }
+    if (engineFadeStuntInterval) { clearInterval(engineFadeStuntInterval); engineFadeStuntInterval = null; }
+    if (engineFadeCarInterval) { clearInterval(engineFadeCarInterval); engineFadeCarInterval = null; }
+    
+    if (engineSound && !engineSound.paused) engineSound.pause();
+    if (engineStuntSound && !engineStuntSound.paused) engineStuntSound.pause();
+    if (engineCarSound && !engineCarSound.paused) engineCarSound.pause();
+    activeEngineSound = null;
+}
+
+function fadeOutEngine(duration = 400) {
+    if (engineSound && !engineSound.paused) {
+        if (engineFadeInterval) clearInterval(engineFadeInterval);
+        const steps = 20; const stepTime = duration / steps;
+        const startVolume = engineSound.volume; let step = 0;
+        engineFadeInterval = setInterval(() => {
+            step++;
+            const newVol = startVolume * (1 - step / steps);
+            if (newVol <= 0 || step >= steps) {
+                engineSound.volume = 0; engineSound.pause(); engineSound.currentTime = 0;
+                engineSound.volume = ENGINE_MAX_VOLUME;
+                clearInterval(engineFadeInterval); engineFadeInterval = null;
+            } else engineSound.volume = newVol;
+        }, stepTime);
+    }
+    if (engineStuntSound && !engineStuntSound.paused) {
+        if (engineFadeStuntInterval) clearInterval(engineFadeStuntInterval);
+        const steps = 20; const stepTime = duration / steps;
+        const startVolume = engineStuntSound.volume; let step = 0;
+        engineFadeStuntInterval = setInterval(() => {
+            step++;
+            const newVol = startVolume * (1 - step / steps);
+            if (newVol <= 0 || step >= steps) {
+                engineStuntSound.volume = 0; engineStuntSound.pause(); engineStuntSound.currentTime = 0;
+                engineStuntSound.volume = ENGINE_MAX_VOLUME;
+                clearInterval(engineFadeStuntInterval); engineFadeStuntInterval = null;
+            } else engineStuntSound.volume = newVol;
+        }, stepTime);
+    }
+    if (engineCarSound && !engineCarSound.paused) {
+        if (engineFadeCarInterval) clearInterval(engineFadeCarInterval);
+        const steps = 20; const stepTime = duration / steps;
+        const startVolume = engineCarSound.volume; let step = 0;
+        engineFadeCarInterval = setInterval(() => {
+            step++;
+            const newVol = startVolume * (1 - step / steps);
+            if (newVol <= 0 || step >= steps) {
+                engineCarSound.volume = 0; engineCarSound.pause(); engineCarSound.currentTime = 0;
+                engineCarSound.volume = ENGINE_MAX_VOLUME;
+                clearInterval(engineFadeCarInterval); engineFadeCarInterval = null;
+            } else engineCarSound.volume = newVol;
+        }, stepTime);
+    }
+    activeEngineSound = null;
+}
+
+function stopEngine() {
+    if (engineFadeInterval) { clearInterval(engineFadeInterval); engineFadeInterval = null; }
+    if (engineFadeStuntInterval) { clearInterval(engineFadeStuntInterval); engineFadeStuntInterval = null; }
+    if (engineFadeCarInterval) { clearInterval(engineFadeCarInterval); engineFadeCarInterval = null; }
+    
+    if (engineSound) { engineSound.pause(); engineSound.currentTime = 0; engineSound.volume = ENGINE_MAX_VOLUME; }
+    if (engineStuntSound) { engineStuntSound.pause(); engineStuntSound.currentTime = 0; engineStuntSound.volume = ENGINE_MAX_VOLUME; }
+    if (engineCarSound) { engineCarSound.pause(); engineCarSound.currentTime = 0; engineCarSound.volume = ENGINE_MAX_VOLUME; }
+    activeEngineSound = null;
+}
+
+function switchEngineSoundIfNeeded() {
+    if (!game.isGas) return;
+    if (currentEngineSound === 'none' || currentEngineSound === 'car7') return;
+    if (!engineStuntSound) return;
+    
+    if (game.inStunt) {
+        if (activeEngineSound !== 'stunt') playEngineStunt();
+    } else {
+        if (activeEngineSound === 'stunt') playEngine();
+    }
+}
+
+function stopBackground() {
+    if (!backgroundSound) return;
+    if (!backgroundSound.paused) backgroundSound.pause();
+}
+function resumeBackground() {
+    if (currentBackgroundSound === 'none') return;
+    if (!backgroundSound) return;
+    if (backgroundSound.paused) backgroundSound.play().catch(() => {});
+}
+
+// ============================================================
+// МУЗЫКА
+// ============================================================
+function toggleBass() {
+    if (!bike7Sound) return;
+    if (bassPlaying) {
+        bike7Sound.pause();
+        bike7Sound.currentTime = 0;
+        bassPlaying = false;
+        document.getElementById('btn-bass').classList.remove('active-bass');
+    } else {
+        bike7Sound.volume = 0.6;
+        bike7Sound.play().catch(() => {});
+        bassPlaying = true;
+        document.getElementById('btn-bass').classList.add('active-bass');
+    }
+}
+function stopBass() {
+    if (!bike7Sound) return;
+    bike7Sound.pause();
+    bike7Sound.currentTime = 0;
+    bassPlaying = false;
+    document.getElementById('btn-bass').classList.remove('active-bass');
+}
+
+// ============================================================
+// СОСТОЯНИЕ
+// ============================================================
+const CONFIG = {
+    gasRampUp: 800, gasRampDown: 400, brakeSpeed: 3.0, returnSpeed: 0.03,
+    maxLeanBack: 90, maxLeanFwd: 25, fallAngle: 90, fallTime: 2500,
+    baseSpeed: 5, roadMultiplier: 3, stuntBonus: 0.8,
+    gravityPull: 0.08, minBrakeSpeed: 0.67,
+    moneyPerMeter: 5,
+    naturalDecay: 0.995, minNaturalSpeed: 0.5,
+    clutchStuntBoost: 8.0, clutchChargeTime: 500,
+    stuntLeanSpeed: 1.2, stuntDecayPerFrame: 0.002, stuntReturnSpeed: 0.05,
+    stuntScorePerSec: 100, stuntCompleteBonus: 500,
+    
+    gasLevelHigh: 1.0,
+    gasLevelLow: 0.45,
+    
+    stuntStabilizeSpeed: 0.15,
+    stuntStabilizeMinAngle: 35,
+    stuntStabilizeMaxAngle: 75,
+    
+    bicycleStuntLeanSpeed: 0.8,
+    bicycleStuntBoost: 6.0
+};
+
+const game = {
+    bikeAngle: 0, worldOffset: 0, speed: 0,
+    isGas: false, isBrake: false, isGameOver: false, isPaused: false,
+    distance: 0, smoke: [], sparks: [], carSparks: [],
+    fallTimer: 0, gasLevel: 0, isLocked: false, brakeHoldTime: 0,
+    earnedMoney: 0, maxAngle: 0, stuntTime: 0,
+    isRunning: false, speedMultiplier: 1.0, currentType: 'bike', currentBikeData: null,
+    wheelRotation: 0,
+    isClutch: false, clutchTime: 0, clutchReleased: false, clutchBoost: 0,
+    inStunt: false, stuntWasActive: false,
+    stuntSessionEarnings: 0,
+    stuntScoreEarned: 0, stuntReturnedCleanly: false,
+    gasMode: 'none',
+    currentAcceleration: 0.005,
+    isTrick: false
+};
+
+const bike = { x: 0, y: 0, width: 400, height: 400, pivotX: 0.18, pivotY: 0.88 };
+
+function updateBikePosition() {
+    if (!W || !H) return;
+    bike.x = W * 0.24;
+    bike.y = H * 0.85;
+    bike.width = Math.min(W * 0.58, 520);
+    bike.height = bike.width;
+}
+
+// ============================================================
+// ЭКРАНЫ
+// ============================================================
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    
+    if (id === 'shop-screen') { updateShopUI(); game.isRunning = false; }
+    if (id === 'game-screen') { startGame(); }
+    if (id === 'menu-screen') { game.isRunning = false; stopBass(); startMenuSound(); }
+}
+
+// ============================================================
+// КНОПКИ
+// ============================================================
+function onButtonClick(btn, callback) {
+    let touched = false;
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); touched = true; btn.classList.add('pressed'); }, { passive: false });
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        btn.classList.remove('pressed');
+        if (touched) { touched = false; callback(); }
+    }, { passive: false });
+    btn.addEventListener('touchcancel', (e) => { btn.classList.remove('pressed'); touched = false; });
+    btn.addEventListener('click', (e) => { e.preventDefault(); if (!touched) callback(); });
+}
+
+onButtonClick(document.getElementById('btn-play'), () => { initSound(); fadeOutMenuSound(1200); showScreen('game-screen'); });
+onButtonClick(document.getElementById('btn-shop'), () => { initSound(); showScreen('shop-screen'); });
+
+// ============================================================
+// ПАУЗА
+// ============================================================
+const pauseEarningsEl = document.getElementById('pause-earnings');
+
+onButtonClick(document.getElementById('btn-pause'), () => {
+    if (!game.isRunning || game.isGameOver) return;
+    game.isPaused = true;
+    pauseEngineImmediate();
+    
+    const earned = Math.floor(game.earnedMoney);
+    pauseEarningsEl.textContent = 'Заработано: ' + earned.toLocaleString('ru-RU') + ' ₽';
+    
+    document.getElementById('pause-screen').classList.add('active');
+});
+
+onButtonClick(document.getElementById('btn-resume'), () => {
+    game.isPaused = false;
+    document.getElementById('pause-screen').classList.remove('active');
+    lastTime = 0;
+    requestAnimationFrame(gameLoop);
+});
+
+onButtonClick(document.getElementById('btn-pause-menu'), () => {
+    const earned = Math.floor(game.earnedMoney);
+    if (earned > 0) {
+        save.money += earned;
+        persistSave();
+    }
+    
+    game.isPaused = false;
+    game.isRunning = false;
+    game.isGameOver = true;
+    
+    document.getElementById('pause-screen').classList.remove('active');
+    stopBackground(); stopBass(); stopEngine();
+    showScreen('menu-screen');
+});
+
+// ============================================================
+// МАГАЗИН
+// ============================================================
+let shopIndex = 0;
+function getCurrentBike() { return BIKES[shopIndex]; }
+function isOwned(bikeId) { return save.ownedBikes.includes(bikeId); }
+
+function updateShopUI() {
+    const bikeData = getCurrentBike();
+    const owned = isOwned(bikeData.id);
+    const selected = save.selectedBike === bikeData.id;
+    
+    document.getElementById('shop-balance').textContent = save.money.toLocaleString('ru-RU') + ' ₽';
+    document.getElementById('shop-bike-name').textContent = bikeData.name;
+    document.getElementById('shop-bike-speed').textContent = 'Макс: ' + bikeData.maxSpeed + ' км/ч';
+    
+    const wheelRear = document.getElementById('shop-wheel-rear');
+    const wheelFrontBike = document.getElementById('shop-wheel-front-bike');
+    const wheelFront = document.getElementById('shop-wheel-front');
+    const wheelBack = document.getElementById('shop-wheel-back');
+    const shopImg = document.getElementById('shop-bike-img');
+    const shopQuestion = document.getElementById('shop-question');
+    
+    wheelRear.classList.remove('visible');
+    wheelFrontBike.classList.remove('visible');
+    wheelFront.classList.remove('visible');
+    wheelBack.classList.remove('visible');
+    
+    if (bikeData.hideImage) {
+        shopImg.style.display = 'none';
+        shopQuestion.classList.add('visible');
+    } else {
+        shopImg.style.display = 'block';
+        shopQuestion.classList.remove('visible');
+        shopImg.src = bikeData.image;
+        
+        if (bikeData.type === 'car' && bikeData.wheelImage) {
+            wheelFront.src = bikeData.wheelImage;
+            wheelBack.src = bikeData.wheelImage;
+            wheelFront.style.left = (bikeData.wheelFrontX * 100) + '%';
+            wheelFront.style.top = (bikeData.wheelFrontY * 100) + '%';
+            wheelFront.style.width = (bikeData.wheelRadius * 2 * 100) + '%';
+            wheelFront.style.height = (bikeData.wheelRadius * 2 * 100) + '%';
+            wheelFront.style.transform = 'translate(-50%, -50%)';
+            wheelBack.style.left = (bikeData.wheelBackX * 100) + '%';
+            wheelBack.style.top = (bikeData.wheelBackY * 100) + '%';
+            wheelBack.style.width = (bikeData.wheelRadius * 2 * 100) + '%';
+            wheelBack.style.height = (bikeData.wheelRadius * 2 * 100) + '%';
+            wheelBack.style.transform = 'translate(-50%, -50%)';
+            wheelFront.classList.add('visible');
+            wheelBack.classList.add('visible');
+        } else if (bikeData.hasWheels && bikeData.wheelImage) {
+            wheelRear.src = bikeData.wheelImage;
+            wheelRear.style.left = (bikeData.rearWheelX * 100) + '%';
+            wheelRear.style.top = (bikeData.rearWheelY * 100) + '%';
+            wheelRear.style.width = (bikeData.rearWheelRadius * 2 * 100) + '%';
+            wheelRear.style.height = (bikeData.rearWheelRadius * 2 * 100) + '%';
+            wheelRear.style.transform = 'translate(-50%, -50%)';
+            wheelRear.classList.add('visible');
+            
+            wheelFrontBike.src = bikeData.wheelImage;
+            wheelFrontBike.style.left = (bikeData.frontWheelX * 100) + '%';
+            wheelFrontBike.style.top = (bikeData.frontWheelY * 100) + '%';
+            wheelFrontBike.style.width = (bikeData.frontWheelRadius * 2 * 100) + '%';
+            wheelFrontBike.style.height = (bikeData.frontWheelRadius * 2 * 100) + '%';
+            wheelFrontBike.style.transform = 'translate(-50%, -50%)';
+            wheelFrontBike.classList.add('visible');
+        }
+    }
+    
+    const statusEl = document.getElementById('shop-bike-status');
+    if (selected) { statusEl.textContent = '✓ Выбран'; statusEl.style.color = '#fff'; }
+    else if (owned) { statusEl.textContent = 'Куплен'; statusEl.style.color = '#fff'; }
+    else { statusEl.textContent = 'Не куплен'; statusEl.style.color = '#aaa'; }
+    
+    const btnBuy = document.getElementById('btn-buy');
+    const btnSelect = document.getElementById('btn-select');
+    
+    if (owned) {
+        btnBuy.style.display = 'none';
+        btnSelect.style.display = 'flex';
+        if (selected) {
+            btnSelect.textContent = 'ВЫБРАНО';
+            btnSelect.disabled = true;
+        } else {
+            btnSelect.textContent = 'ВЫБРАТЬ';
+            btnSelect.disabled = false;
+        }
+    } else {
+        btnBuy.style.display = 'flex';
+        btnSelect.style.display = 'none';
+        btnBuy.textContent = 'КУПИТЬ — ' + bikeData.price.toLocaleString('ru-RU') + ' ₽';
+        btnBuy.disabled = save.money < bikeData.price;
+    }
+    
+    document.getElementById('prev-bike').disabled = shopIndex === 0;
+    document.getElementById('next-bike').disabled = shopIndex === BIKES.length - 1;
+}
+
+onButtonClick(document.getElementById('prev-bike'), () => { if (shopIndex > 0) { shopIndex--; updateShopUI(); } });
+onButtonClick(document.getElementById('next-bike'), () => { if (shopIndex < BIKES.length - 1) { shopIndex++; updateShopUI(); } });
+
+onButtonClick(document.getElementById('btn-buy'), () => {
+    const bikeData = getCurrentBike();
+    if (save.money >= bikeData.price && !isOwned(bikeData.id)) {
+        save.money -= bikeData.price;
+        save.ownedBikes.push(bikeData.id);
+        save.selectedBike = bikeData.id;
+        persistSave();
+        updateShopUI();
+    }
+});
+
+onButtonClick(document.getElementById('btn-select'), () => {
+    const bikeData = getCurrentBike();
+    if (isOwned(bikeData.id)) {
+        save.selectedBike = bikeData.id;
+        persistSave();
+        updateShopUI();
+    }
+});
+
+onButtonClick(document.getElementById('shop-back'), () => showScreen('menu-screen'));
+
+// ============================================================
+// УПРАВЛЕНИЕ В ИГРЕ
+// ============================================================
+const btnGas = document.getElementById('btn-gas');
+const btnBrake = document.getElementById('btn-brake');
+const btnBass = document.getElementById('btn-bass');
+const btnClutch = document.getElementById('btn-clutch');
+const btnTrick = document.getElementById('btn-trick');
+const gasFill = document.getElementById('gas-fill');
+const gasZoneHigh = document.getElementById('gas-zone-high');
+const gasZoneLow = document.getElementById('gas-zone-low');
+const stuntEarningsEl = document.getElementById('stunt-earnings');
+
+function bindButton(btn, onPress, onRelease) {
+    const press = (e) => { e.preventDefault(); btn.classList.add('pressed'); onPress(); };
+    const release = (e) => { e.preventDefault(); btn.classList.remove('pressed'); onRelease(); };
+    btn.addEventListener('touchstart', press, { passive: false });
+    btn.addEventListener('touchend', release, { passive: false });
+    btn.addEventListener('touchcancel', release, { passive: false });
+    btn.addEventListener('mousedown', press);
+    btn.addEventListener('mouseup', release);
+    btn.addEventListener('mouseleave', release);
+}
+
+function startGas(mode) {
+    game.isGas = true;
+    game.gasMode = mode;
+    initSound();
+    if (game.inStunt || game.stuntWasActive || game.isLocked) playEngineStunt();
+    else playEngine();
+    
+    if (game.currentType === 'bicycle' && mode === 'high') {
+        game.clutchBoost = CONFIG.bicycleStuntBoost;
+    }
+}
+
+function stopGas() {
+    game.isGas = false;
+    game.gasMode = 'none';
+    if (game.inStunt || game.stuntWasActive || game.isLocked) pauseEngineImmediate();
+    else fadeOutEngine(400);
+}
+
+gasZoneHigh.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    gasZoneHigh.classList.add('pressed');
+    startGas('high');
+}, { passive: false });
+gasZoneHigh.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    gasZoneHigh.classList.remove('pressed');
+    stopGas();
+}, { passive: false });
+gasZoneHigh.addEventListener('touchcancel', (e) => {
+    gasZoneHigh.classList.remove('pressed');
+    stopGas();
+});
+gasZoneHigh.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    gasZoneHigh.classList.add('pressed');
+    startGas('high');
+});
+gasZoneHigh.addEventListener('mouseup', (e) => {
+    e.preventDefault();
+    gasZoneHigh.classList.remove('pressed');
+    stopGas();
+});
+gasZoneHigh.addEventListener('mouseleave', (e) => {
+    gasZoneHigh.classList.remove('pressed');
+    if (game.gasMode === 'high') stopGas();
+});
+
+gasZoneLow.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    gasZoneLow.classList.add('pressed');
+    startGas('low');
+}, { passive: false });
+gasZoneLow.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    gasZoneLow.classList.remove('pressed');
+    stopGas();
+}, { passive: false });
+gasZoneLow.addEventListener('touchcancel', (e) => {
+    gasZoneLow.classList.remove('pressed');
+    stopGas();
+});
+gasZoneLow.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    gasZoneLow.classList.add('pressed');
+    startGas('low');
+});
+gasZoneLow.addEventListener('mouseup', (e) => {
+    e.preventDefault();
+    gasZoneLow.classList.remove('pressed');
+    stopGas();
+});
+gasZoneLow.addEventListener('mouseleave', (e) => {
+    gasZoneLow.classList.remove('pressed');
+    if (game.gasMode === 'low') stopGas();
+});
+
+bindButton(btnBrake,
+    () => { game.isBrake = true; initSound(); game.brakeHoldTime = 0; },
+    () => { game.isBrake = false; game.brakeHoldTime = 0; }
+);
+
+bindButton(btnClutch,
+    () => {
+        game.isClutch = true;
+        game.clutchTime = 0;
+        game.clutchReleased = false;
+    },
+    () => {
+        if (game.isClutch) {
+            game.clutchReleased = true;
+            if (game.clutchTime >= CONFIG.clutchChargeTime) {
+                const charge = Math.min(game.clutchTime / CONFIG.clutchChargeTime, 2.0);
+                game.clutchBoost = CONFIG.clutchStuntBoost * charge;
+            }
+            game.isClutch = false;
+        }
+    }
+);
+
+// ─── КНОПКА "1" — ТРЮК ВЕЛОСИПЕДА (ТАП = ВКЛ/ВЫКЛ) ───
+let trickTouched = false;
+
+btnTrick.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    btnTrick.classList.add('pressed');
+    trickTouched = true;
+}, { passive: false });
+btnTrick.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    btnTrick.classList.remove('pressed');
+    if (trickTouched) {
+        trickTouched = false;
+        toggleTrick();
+    }
+}, { passive: false });
+btnTrick.addEventListener('touchcancel', () => {
+    btnTrick.classList.remove('pressed');
+    trickTouched = false;
+});
+btnTrick.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!trickTouched) toggleTrick();
+});
+
+function toggleTrick() {
+    game.isTrick = !game.isTrick;
+    
+    if (game.isTrick) {
+        btnTrick.classList.add('active-trick');
+        if (game.currentBikeData && game.currentBikeData.trickImage) {
+            const trickImg = new Image();
+            trickImg.onload = () => {
+                images.trick = trickImg;
+            };
+            trickImg.src = game.currentBikeData.trickImage;
+        }
+    } else {
+        btnTrick.classList.remove('active-trick');
+    }
+}
+
+btnBass.addEventListener('touchstart', (e) => { e.preventDefault(); btnBass.classList.add('pressed'); }, { passive: false });
+btnBass.addEventListener('touchend', (e) => { e.preventDefault(); btnBass.classList.remove('pressed'); toggleBass(); }, { passive: false });
+btnBass.addEventListener('touchcancel', () => { btnBass.classList.remove('pressed'); });
+btnBass.addEventListener('click', (e) => { e.preventDefault(); toggleBass(); });
+
+document.addEventListener('keydown', (e) => {
+    if (!game.isRunning || game.isPaused) return;
+    if (e.code === 'Space') startGas('high');
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') startGas('low');
+    if (e.code === 'KeyS') { game.isBrake = true; initSound(); game.brakeHoldTime = 0; }
+    if (e.code === 'KeyB' && game.currentType === 'car') { toggleBass(); }
+    if (e.code === 'KeyC' && (game.currentType === 'bike' || game.currentType === 'scooter')) {
+        game.isClutch = true; game.clutchTime = 0; game.clutchReleased = false;
+    }
+    if (e.code === 'Digit1' && game.currentType === 'bicycle') {
+        toggleTrick();
+    }
+    if (e.code === 'Escape') {
+        if (!game.isPaused) {
+            game.isPaused = true;
+            pauseEngineImmediate();
+            const earned = Math.floor(game.earnedMoney);
+            pauseEarningsEl.textContent = 'Заработано: ' + earned.toLocaleString('ru-RU') + ' ₽';
+            document.getElementById('pause-screen').classList.add('active');
+        }
+    }
+});
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+        stopGas();
+    }
+    if (e.code === 'KeyS') { game.isBrake = false; game.brakeHoldTime = 0; }
+    if (e.code === 'KeyC' && game.isClutch) {
+        game.clutchReleased = true;
+        if (game.clutchTime >= CONFIG.clutchChargeTime) {
+            const charge = Math.min(game.clutchTime / CONFIG.clutchChargeTime, 2.0);
+            game.clutchBoost = CONFIG.clutchStuntBoost * charge;
+        }
+        game.isClutch = false;
+    }
+});
+
+// ============================================================
+// СТАРТ
+// ============================================================
+function startGame() {
+    game.bikeAngle = 0; game.worldOffset = 0; game.speed = 0;
+    game.isGas = false; game.isBrake = false; game.isGameOver = false; game.isPaused = false;
+    game.distance = 0; game.smoke = []; game.sparks = []; game.carSparks = [];
+    game.fallTimer = 0; game.gasLevel = 0; game.isLocked = false; game.brakeHoldTime = 0;
+    game.earnedMoney = 0; game.maxAngle = 0; game.stuntTime = 0;
+    game.isRunning = true; game.wheelRotation = 0;
+    game.isClutch = false; game.clutchTime = 0; game.clutchReleased = false; game.clutchBoost = 0;
+    game.inStunt = false; game.stuntWasActive = false;
+    game.stuntSessionEarnings = 0; game.stuntScoreEarned = 0; game.stuntReturnedCleanly = false;
+    game.gasMode = 'none';
+    game.isTrick = false;
+    
+    btnTrick.classList.remove('active-trick');
+    
+    stuntEarningsEl.classList.remove('visible');
+    stuntEarningsEl.textContent = '+0 ₽';
+    
+    stopBass(); stopEngine();
+    document.getElementById('pause-screen').classList.remove('active');
+    
+    const selected = BIKES.find(b => b.id === save.selectedBike) || BIKES[0];
+    game.speedMultiplier = selected.speedMultiplier || 1.0;
+    game.currentType = selected.type || 'bike';
+    game.currentBikeData = selected;
+    game.currentAcceleration = selected.acceleration || 0.005;
+    currentEngineSound = selected.engineSound || 'default';
+    currentBackgroundSound = selected.backgroundSound || 'default';
+    
+    btnBass.classList.remove('visible');
+    btnClutch.classList.remove('visible');
+    btnTrick.classList.remove('visible');
+    
+    if (game.currentType === 'car') {
+        btnBass.classList.add('visible');
+    } else if (game.currentType === 'bicycle') {
+        btnTrick.classList.add('visible');
+    } else {
+        btnClutch.classList.add('visible');
+    }
+    
+    images.bike = null;
+    const img = new Image();
+    img.onload = () => { images.bike = img; };
+    img.src = selected.image;
+    
+    images.bikeWheel = null;
+    if (selected.hasWheels && selected.wheelImage) {
+        const wImg = new Image();
+        wImg.onload = () => { images.bikeWheel = wImg; };
+        wImg.src = selected.wheelImage;
+    }
+    
+    images.wheel = null;
+    if (selected.type === 'car' && selected.wheelImage) {
+        const wImg = new Image();
+        wImg.onload = () => { images.wheel = wImg; };
+        wImg.src = selected.wheelImage;
+    }
+    
+    images.trick = null;
+    
+    if (!images.background) {
+        const bgImg = new Image();
+        bgImg.onload = () => { images.background = bgImg; };
+        bgImg.src = ASSETS.background;
+    }
+    
+    if (currentBackgroundSound === 'default') resumeBackground();
+    else stopBackground();
+    
+    resize();
+    document.getElementById('gameover').classList.remove('active');
+    
+    lastTime = 0;
+    requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+// ЛОГИКА
+// ============================================================
+function update(delta) {
+    if (game.isGameOver || !game.isRunning || game.isPaused) return;
+
+    const isCar = game.currentType === 'car';
+    const isBike = (game.currentType === 'bike' || game.currentType === 'bicycle');
+    const isScooter = game.currentType === 'scooter';
+
+    if (game.isClutch) {
+        game.clutchTime += delta;
+    }
+
+    let targetGasLevel = 0;
+    if (game.gasMode === 'high') targetGasLevel = CONFIG.gasLevelHigh;
+    else if (game.gasMode === 'low') targetGasLevel = CONFIG.gasLevelLow;
+    else targetGasLevel = 0;
+    
+    if (game.gasLevel < targetGasLevel) {
+        game.gasLevel += delta / CONFIG.gasRampUp;
+        if (game.gasLevel > targetGasLevel) game.gasLevel = targetGasLevel;
+    } else if (game.gasLevel > targetGasLevel) {
+        game.gasLevel -= delta / CONFIG.gasRampDown;
+        if (game.gasLevel < targetGasLevel) game.gasLevel = targetGasLevel;
+    }
+    
+    gasFill.style.height = (game.gasLevel * 100) + '%';
+
+    if (isBike || isScooter) {
+        if (game.bikeAngle <= -CONFIG.fallAngle) {
+            game.bikeAngle = -CONFIG.fallAngle;
+            game.isLocked = true;
+        } else {
+            game.isLocked = false;
+        }
+
+        if (game.isBrake) {
+            if (game.bikeAngle > 0) game.bikeAngle -= CONFIG.brakeSpeed;
+            else if (game.bikeAngle < 0) game.bikeAngle += CONFIG.brakeSpeed;
+            if (Math.abs(game.bikeAngle) < 0.5) game.bikeAngle = 0;
+        } else if (!game.isLocked) {
+            const leanSpeed = (game.currentType === 'bicycle') 
+                ? CONFIG.bicycleStuntLeanSpeed 
+                : CONFIG.stuntLeanSpeed;
+            
+            if (game.isGas && game.gasLevel > 0.05 && game.clutchBoost > 0) {
+                game.bikeAngle -= leanSpeed * game.gasLevel;
+                game.clutchBoost -= delta * CONFIG.stuntDecayPerFrame;
+                if (game.clutchBoost < 0) game.clutchBoost = 0;
+                game.inStunt = true;
+                game.stuntWasActive = true;
+            } else {
+                game.bikeAngle *= (1 - CONFIG.stuntReturnSpeed);
+                if (game.inStunt) game.inStunt = false;
+            }
+            
+            if (game.gasMode === 'low' && game.inStunt && !game.isLocked) {
+                const absAngle = Math.abs(game.bikeAngle);
+                if (absAngle > CONFIG.stuntStabilizeMinAngle && absAngle < CONFIG.stuntStabilizeMaxAngle) {
+                    if (absAngle > 50) {
+                        game.bikeAngle += CONFIG.stuntStabilizeSpeed * delta * 0.016;
+                    }
+                }
+            }
+            
+            if (game.bikeAngle < 0) {
+                game.bikeAngle -= CONFIG.gravityPull * (Math.abs(game.bikeAngle) / 90);
+            }
+        }
+
+        switchEngineSoundIfNeeded();
+
+        if (game.bikeAngle >= CONFIG.maxLeanFwd) game.bikeAngle = CONFIG.maxLeanFwd;
+        if (game.bikeAngle <= -CONFIG.maxLeanBack) game.bikeAngle = -CONFIG.maxLeanBack;
+
+        const absAngle = Math.abs(game.bikeAngle);
+        if (absAngle > game.maxAngle) game.maxAngle = absAngle;
+
+        if (game.bikeAngle <= -CONFIG.fallAngle) {
+            game.fallTimer += delta;
+            if (game.fallTimer >= CONFIG.fallTime) gameOver();
+        } else {
+            game.fallTimer = 0;
+        }
+
+        if (game.isLocked && !game.isGameOver) {
+            for (let i = 0; i < 3; i++) {
+                if (Math.random() < 0.7) {
+                    game.sparks.push({
+                        x: bike.x + bike.width * bike.pivotX - (80 + Math.random() * 60),
+                        y: bike.y - Math.random() * 10,
+                        vx: -Math.random() * 6 - 2, vy: -Math.random() * 3 + 1,
+                        life: 1, size: Math.random() * 2 + 1,
+                        color: Math.random() < 0.5 ? '#ffcc00' : '#ff8800'
+                    });
+                }
+            }
+        }
+    } else {
+        game.bikeAngle = 0; game.isLocked = false; game.fallTimer = 0; game.inStunt = false;
+        if (game.speed > 2 && game.currentBikeData) {
+            const bd = game.currentBikeData;
+            const speedFactor = Math.min(game.speed / 8, 1);
+            const sparkCount = Math.floor(speedFactor * 3);
+            for (let i = 0; i < sparkCount; i++) {
+                if (Math.random() < 0.6) {
+                    const useFront = Math.random() < 0.5;
+                    const wheelX = useFront ? bike.x + bike.width * bd.wheelFrontX : bike.x + bike.width * bd.wheelBackX;
+                    game.carSparks.push({
+                        x: wheelX + (Math.random() - 0.5) * 30,
+                        y: bike.y - 5 + (Math.random() - 0.5) * 5,
+                        vx: -Math.random() * 4 - 1, vy: -Math.random() * 2 + 0.5,
+                        life: 1, size: Math.random() * 1.8 + 0.8,
+                        color: Math.random() < 0.5 ? '#ffcc00' : '#ff8800'
+                    });
+                }
+            }
+        }
+    }
+
+    if ((isBike || isScooter) && game.inStunt && !game.isLocked) {
+        const angleEarn = (CONFIG.stuntScorePerSec / 1000) * delta;
+        game.stuntSessionEarnings += angleEarn;
+        game.earnedMoney += angleEarn;
+        
+        stuntEarningsEl.classList.add('visible');
+        stuntEarningsEl.textContent = '+' + Math.floor(game.stuntSessionEarnings).toLocaleString('ru-RU') + ' ₽';
+    }
+    
+    if ((isBike || isScooter) && game.stuntWasActive && !game.inStunt && !game.isGameOver) {
+        const wasFalling = game.bikeAngle <= -CONFIG.fallAngle;
+        if (!wasFalling) {
+            game.earnedMoney += CONFIG.stuntCompleteBonus;
+            game.stuntSessionEarnings += CONFIG.stuntCompleteBonus;
+            
+            stuntEarningsEl.textContent = '+' + Math.floor(game.stuntSessionEarnings).toLocaleString('ru-RU') + ' ₽';
+            
+            setTimeout(() => {
+                stuntEarningsEl.classList.remove('visible');
+            }, 500);
+            
+            game.stuntWasActive = false;
+            game.stuntReturnedCleanly = true;
+            game.stuntSessionEarnings = 0;
+        }
+    }
+
+    for (let i = game.sparks.length - 1; i >= 0; i--) {
+        const s = game.sparks[i];
+        s.x += s.vx; s.y += s.vy; s.vy += 0.3; s.vx *= 0.98; s.life -= 0.04;
+        if (s.life <= 0) game.sparks.splice(i, 1);
+    }
+    for (let i = game.carSparks.length - 1; i >= 0; i--) {
+        const s = game.carSparks[i];
+        s.x += s.vx; s.y += s.vy; s.vy += 0.25; s.vx *= 0.96; s.life -= 0.05;
+        if (s.life <= 0) game.carSparks.splice(i, 1);
+    }
+
+    if (game.isGas) {
+        const targetSpeed = CONFIG.baseSpeed * game.speedMultiplier * (1 + CONFIG.stuntBonus * game.gasLevel);
+        game.speed += (targetSpeed - game.speed) * game.currentAcceleration;
+    } else {
+        game.speed *= CONFIG.naturalDecay;
+        if (game.speed < CONFIG.minNaturalSpeed) game.speed = CONFIG.minNaturalSpeed;
+    }
+    
+    if (game.isBrake && !game.inStunt) {
+        game.brakeHoldTime += delta;
+        const brakeFactor = Math.min(game.brakeHoldTime / 800, 1);
+        const brakeTarget = CONFIG.minBrakeSpeed;
+        game.speed = game.speed * (1 - brakeFactor * 0.05) + brakeTarget * brakeFactor * 0.05;
+        if (game.speed < CONFIG.minBrakeSpeed) game.speed = CONFIG.minBrakeSpeed;
+    } else {
+        game.brakeHoldTime = 0;
+    }
+
+    game.wheelRotation += game.speed * 0.5;
+    if (game.wheelRotation > Math.PI * 2) game.wheelRotation -= Math.PI * 2;
+
+    game.worldOffset += game.speed * CONFIG.roadMultiplier;
+    const bgW = images.background ? images.background.width : 800;
+    if (game.worldOffset >= bgW) game.worldOffset -= bgW;
+
+    game.distance += game.speed * 0.05;
+
+    if (isBike || isScooter) {
+        const metersThisFrame = game.speed * 0.05;
+        game.earnedMoney += metersThisFrame * CONFIG.moneyPerMeter;
+    }
+
+    if (game.gasLevel > 0.3 && Math.random() < 0.15 * game.gasLevel && (isBike || isScooter)) {
+        game.smoke.push({
+            x: bike.x + bike.width * bike.pivotX, y: bike.y - 15,
+            vx: -Math.random() * 2 - 1, vy: -Math.random() * 1.5 - 0.3,
+            life: 1, size: Math.random() * 12 + 8
+        });
+    }
+
+    for (let i = game.smoke.length - 1; i >= 0; i--) {
+        const p = game.smoke[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size += 0.4;
+        if (p.life <= 0) game.smoke.splice(i, 1);
+    }
+
+    const speedKmh = Math.floor(game.speed * 15);
+    document.getElementById('speedometer').textContent = speedKmh + ' км/ч';
+    document.getElementById('distance').textContent = Math.floor(game.distance) + ' м';
+}
+
+// ============================================================
+// ОТРИСОВКА
+// ============================================================
+function draw() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+
+    if (images.background) {
+        const bgW = Math.max(W, images.background.width);
+        const bgH = H;
+        let bgX = -(game.worldOffset % bgW);
+        ctx.drawImage(images.background, bgX, 0, bgW, bgH);
+        ctx.drawImage(images.background, bgX + bgW, 0, bgW, bgH);
+    } else {
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#4a6a8a');
+        grad.addColorStop(1, '#222');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+    }
+
+    for (const p of game.smoke) {
+        ctx.fillStyle = `rgba(200, 200, 200, ${p.life * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    const pivotCanvasX = bike.x + bike.width * bike.pivotX;
+    const pivotCanvasY = bike.y;
+    const isCar = game.currentType === 'car';
+    const bd = game.currentBikeData;
+
+    if (!isCar && images.bikeWheel && bd && bd.hasWheels) {
+        ctx.save();
+        ctx.translate(pivotCanvasX, pivotCanvasY);
+        ctx.rotate(game.bikeAngle * Math.PI / 180);
+        ctx.translate(-pivotCanvasX, -pivotCanvasY);
+        
+        const rearR = bike.width * bd.rearWheelRadius;
+        const rearX = bike.x + bike.width * bd.rearWheelX;
+        const rearY = bike.y - bike.height + bike.height * bd.rearWheelY;
+        ctx.save();
+        ctx.translate(rearX, rearY);
+        ctx.rotate(game.wheelRotation);
+        ctx.drawImage(images.bikeWheel, -rearR, -rearR, rearR * 2, rearR * 2);
+        ctx.restore();
+        
+        const frontR = bike.width * bd.frontWheelRadius;
+        const frontX = bike.x + bike.width * bd.frontWheelX;
+        const frontY = bike.y - bike.height + bike.height * bd.frontWheelY;
+        ctx.save();
+        ctx.translate(frontX, frontY);
+        ctx.rotate(game.wheelRotation);
+        ctx.drawImage(images.bikeWheel, -frontR, -frontR, frontR * 2, frontR * 2);
+        ctx.restore();
+        
+        ctx.restore();
+    }
+    
+    if (isCar && images.wheel && bd) {
+        const wheelR = bike.width * bd.wheelRadius;
+        const frontX = bike.x + bike.width * bd.wheelFrontX;
+        const frontY = bike.y - bike.height + bike.height * bd.wheelFrontY;
+        ctx.save();
+        ctx.translate(frontX, frontY);
+        ctx.rotate(game.wheelRotation);
+        ctx.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
+        ctx.restore();
+        
+        const backX = bike.x + bike.width * bd.wheelBackX;
+        const backY = bike.y - bike.height + bike.height * bd.wheelBackY;
+        ctx.save();
+        ctx.translate(backX, backY);
+        ctx.rotate(game.wheelRotation);
+        ctx.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
+        ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(pivotCanvasX, pivotCanvasY);
+    ctx.rotate(game.bikeAngle * Math.PI / 180);
+    ctx.translate(-pivotCanvasX, -pivotCanvasY);
+
+    let bikeImageToDraw = images.bike;
+    if (game.currentType === 'bicycle' && game.isTrick && images.trick) {
+        bikeImageToDraw = images.trick;
+    }
+    
+    if (bikeImageToDraw) {
+        if (isCar && bd) {
+            const bodyOffsetPx = (bd.bodyOffsetY || 0) * bike.height;
+            const bodyScaleX = bd.bodyScaleX || bd.bodyScale || 1.0;
+            const bodyScaleY = bd.bodyScaleY || bd.bodyScale || 1.0;
+            const bodyW = bike.width * bodyScaleX;
+            const bodyH = bike.height * bodyScaleY;
+            const centerX = bike.x + bike.width / 2;
+            const centerY = bike.y - bike.height / 2;
+            ctx.drawImage(bikeImageToDraw, centerX - bodyW / 2, centerY - bodyH / 2 + bodyOffsetPx, bodyW, bodyH);
+        } else {
+            ctx.drawImage(bikeImageToDraw, bike.x, bike.y - bike.height, bike.width, bike.height);
+        }
+    } else {
+        ctx.fillStyle = '#ff6600';
+        ctx.fillRect(bike.x, bike.y - bike.height, bike.width, bike.height);
+    }
+
+    ctx.restore();
+
+    for (const s of game.carSparks) {
+        ctx.globalAlpha = s.life * 0.4;
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = s.life;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    for (const s of game.sparks) {
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = s.life;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = s.life * 0.3;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
+// ============================================================
+// ЦИКЛ
+// ============================================================
+let lastTime = 0;
+function gameLoop(timestamp) {
+    if (!game.isRunning || game.isPaused) return;
+    if (!lastTime) lastTime = timestamp;
+    const delta = timestamp - lastTime;
+    lastTime = timestamp;
+    const safeDelta = Math.min(delta, 100);
+    update(safeDelta);
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+// КОНЕЦ ИГРЫ
+// ============================================================
+function gameOver() {
+    if (game.isGameOver) return;
+    game.isGameOver = true;
+    game.isRunning = false;
+
+    stuntEarningsEl.classList.remove('visible');
+
+    stopEngine(); stopBackground(); stopBass();
+    if (crashSound) { crashSound.currentTime = 0; crashSound.play().catch(() => {}); }
+
+    const earned = Math.floor(game.earnedMoney);
+    save.money += earned;
+    persistSave();
+
+    document.getElementById('final-distance').textContent = 'Пройдено: ' + Math.floor(game.distance) + ' м';
+    document.getElementById('final-angle').textContent = 'Макс. угол: ' + Math.floor(game.maxAngle) + '°';
+    document.getElementById('final-money').textContent = '+' + earned.toLocaleString('ru-RU') + ' ₽';
+
+    document.getElementById('gameover').classList.add('active');
+}
+
+onButtonClick(document.getElementById('btn-restart'), () => {
+    document.getElementById('gameover').classList.remove('active');
+    startGame();
+});
+onButtonClick(document.getElementById('btn-menu'), () => {
+    document.getElementById('gameover').classList.remove('active');
+    stopBackground(); stopBass();
+    showScreen('menu-screen');
+});
+
+document.addEventListener('touchstart', initSound, { once: true });
+document.addEventListener('click', initSound, { once: true });
+
+// ============================================================
+// ЗАПУСК ЗАГРУЗКИ
+// ============================================================
+resize();
+preloadAllImages();
+</script>
+
+</body>
+</html>
