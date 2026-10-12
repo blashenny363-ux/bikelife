@@ -602,7 +602,6 @@ html, body {
     box-shadow: 0 0 25px rgba(255,255,255,0.4);
 }
 
-/* КНОПКА "1" (для велосипеда SPEEDONE) — тап, не зажим */
 #btn-trick {
     position: fixed;
     right: 18px;
@@ -1065,13 +1064,9 @@ window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 // ============================================================
 const images = { bike: null, wheel: null, bikeWheel: null, background: null, trick: null };
 
-// Список всех картинок для предзагрузки
 const PRELOAD_IMAGES = [
-    // Фоны и меню
     'menu.png', 'background.png',
-    // Байки
     'bike.png', 'bike2.png', 'bike3.png', 'bike4.png', 'bike5.png', 'bike6.png', 'bike6_1.png', 'bike7.png',
-    // Колёса
     'wheel_bike.png', 'wheel_bike6.png', 'wheel_bike7.png'
 ];
 
@@ -1095,10 +1090,8 @@ function preloadAllImages() {
             loadingLoaded++;
             updateLoadingProgress();
             if (loadingLoaded >= loadingTotal) {
-                // Всё загружено — скрываем экран загрузки
                 setTimeout(() => {
                     loadingScreen.classList.add('hidden');
-                    // Показываем меню
                     showScreen('menu-screen');
                 }, 400);
             }
@@ -1400,18 +1393,24 @@ const CONFIG = {
     moneyPerMeter: 5,
     naturalDecay: 0.995, minNaturalSpeed: 0.5,
     clutchStuntBoost: 8.0, clutchChargeTime: 500,
-    stuntLeanSpeed: 1.2, stuntDecayPerFrame: 0.002, stuntReturnSpeed: 0.05,
+    stuntLeanSpeed: 1.2,
+    stuntDecayPerFrame: 0.002,
+    stuntReturnSpeed: 0.012,         // ← медленный возврат (было 0.05)
     stuntScorePerSec: 100, stuntCompleteBonus: 500,
     
     gasLevelHigh: 1.0,
     gasLevelLow: 0.45,
     
-    stuntStabilizeSpeed: 0.15,
+    stuntStabilizeSpeed: 0.06,       // ← мягче стабилизация (было 0.15)
     stuntStabilizeMinAngle: 35,
     stuntStabilizeMaxAngle: 75,
     
     bicycleStuntLeanSpeed: 0.8,
-    bicycleStuntBoost: 6.0
+    bicycleStuntBoost: 6.0,
+    
+    // ─── Плавное опускание байка ───
+    gravityPullSlow: 0.03,           // медленная гравитация в станте
+    returnEaseSpeed: 0.008
 };
 
 const game = {
@@ -1976,7 +1975,9 @@ function update(delta) {
                 game.inStunt = true;
                 game.stuntWasActive = true;
             } else {
+                // ─── ПЛАВНЫЙ ВОЗВРАТ К 0 (медленный) ───
                 game.bikeAngle *= (1 - CONFIG.stuntReturnSpeed);
+                if (game.bikeAngle > -1) game.bikeAngle = 0;
                 if (game.inStunt) game.inStunt = false;
             }
             
@@ -1989,8 +1990,15 @@ function update(delta) {
                 }
             }
             
+            // ─── ПЛАВНАЯ ГРАВИТАЦИЯ ───
             if (game.bikeAngle < 0) {
-                game.bikeAngle -= CONFIG.gravityPull * (Math.abs(game.bikeAngle) / 90);
+                if (game.inStunt) {
+                    // В станте — очень мягкая гравитация
+                    game.bikeAngle -= CONFIG.gravityPullSlow * (Math.abs(game.bikeAngle) / 90);
+                } else {
+                    // Вне станта — обычная
+                    game.bikeAngle -= CONFIG.gravityPull * (Math.abs(game.bikeAngle) / 90);
+                }
             }
         }
 
@@ -2322,7 +2330,7 @@ document.addEventListener('touchstart', initSound, { once: true });
 document.addEventListener('click', initSound, { once: true });
 
 // ============================================================
-// ЗАПУСК ЗАГРУЗКИ
+// ЗАПУСК
 // ============================================================
 resize();
 preloadAllImages();
