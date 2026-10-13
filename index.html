@@ -24,15 +24,14 @@ html, body {
 }
 
 .btn {
-    background: #000;
-    border: 3px solid #333;
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(51, 51, 51, 0.85);
+    border-radius: 8px;
     color: #fff;
     font-weight: bold;
     font-family: Arial, sans-serif;
     cursor: pointer;
-    text-shadow: 1px 1px 3px #000;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     transition: transform 0.05s, background 0.1s, border-color 0.1s;
     display: flex;
     align-items: center;
@@ -40,13 +39,14 @@ html, body {
     padding: 0;
     position: relative;
     z-index: 10;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 .btn:active, .btn.pressed {
-    background: #222;
+    background: rgba(34, 34, 34, 0.9);
     transform: scale(0.96);
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+    border-color: rgba(102, 102, 102, 0.9);
 }
 
 .btn:disabled {
@@ -60,12 +60,16 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    display: none;
+    display: block;
     z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
 }
 
 .screen.active {
-    display: block;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* ============================================================
@@ -83,7 +87,7 @@ html, body {
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.5s;
+    transition: opacity 0.6s ease;
 }
 
 #loading-screen.hidden {
@@ -92,10 +96,9 @@ html, body {
 }
 
 #loading-wheel {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 40px;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+    width: 90px;
+    height: 90px;
+    margin-bottom: 30px;
     animation: spinWheel 1s linear infinite;
 }
 
@@ -106,13 +109,12 @@ html, body {
 
 #loading-progress-container {
     width: 60%;
-    max-width: 300px;
-    height: 20px;
-    background: #000;
-    border: 3px solid #fff;
+    max-width: 260px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #fff;
     border-radius: 4px;
     overflow: hidden;
-    position: relative;
 }
 
 #loading-progress-bar {
@@ -124,16 +126,16 @@ html, body {
 
 #loading-text {
     color: #fff;
-    font-size: 16px;
-    margin-top: 15px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    margin-top: 12px;
+    letter-spacing: 1px;
     font-weight: bold;
 }
 
 #loading-percent {
     color: #fff;
-    font-size: 14px;
-    margin-top: 5px;
+    font-size: 11px;
+    margin-top: 4px;
     letter-spacing: 1px;
 }
 
@@ -194,9 +196,8 @@ html, body {
     font-family: 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive;
     font-style: italic;
     font-weight: 900;
-    text-shadow: 0 0 20px rgba(255,255,255,0.8), 3px 3px 6px #000;
     letter-spacing: 3px;
-    line-height: 1.05;
+    line-height: 1.0;
     pointer-events: none;
     z-index: 5;
     animation: titlePulse 2.5s infinite;
@@ -210,29 +211,27 @@ html, body {
 }
 
 #menu-title .line1 {
-    font-size: 64px;
+    font-size: 76px;
     display: block;
     color: #fff;
     font-weight: 900;
 }
 
 #menu-title .line2 {
-    font-size: 52px;
+    font-size: 62px;
     display: block;
     color: #ffcc00;
-    text-shadow: 0 0 20px rgba(255,204,0,0.8), 3px 3px 6px #000;
     transform: rotate(2deg);
-    margin-left: 25px;
+    margin-left: 30px;
     font-weight: 900;
 }
 
 #menu-title .line3 {
-    font-size: 44px;
+    font-size: 52px;
     display: block;
     color: #00ccff;
-    text-shadow: 0 0 20px rgba(0,204,255,0.8), 3px 3px 6px #000;
     transform: rotate(-2deg);
-    margin-left: 80px;
+    margin-left: 90px;
     font-weight: 900;
 }
 
@@ -244,15 +243,168 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
     padding: 0 20px;
     z-index: 10;
 }
 
 #menu-buttons .btn {
-    width: 240px;
-    height: 70px;
-    font-size: 22px;
+    width: 200px;
+    height: 55px;
+    font-size: 16px;
+}
+
+#btn-settings {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    z-index: 20;
+}
+
+/* ============================================================
+   НАСТРОЙКИ
+   ============================================================ */
+#settings-screen {
+    background: #000;
+    overflow: hidden;
+}
+
+#settings-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 1;
+    filter: blur(2px);
+}
+
+#settings-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 5;
+}
+
+#settings-title {
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    letter-spacing: 3px;
+}
+
+.setting-block {
+    width: 90%;
+    max-width: 360px;
+    margin-bottom: 24px;
+}
+
+.setting-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.setting-value {
+    color: #fff;
+    font-size: 13px;
+    min-width: 45px;
+    text-align: right;
+}
+
+.slider-container {
+    width: 100%;
+    height: 36px;
+    position: relative;
+}
+
+input[type="range"].custom-slider {
+    width: 100%;
+    height: 36px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+}
+
+input[type="range"].custom-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(51, 51, 51, 0.85);
+    border-radius: 4px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
+}
+
+input[type="range"].custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    margin-top: -11px;
+    border: 2px solid #000;
+    cursor: pointer;
+}
+
+input[type="range"].custom-slider::-moz-range-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(51, 51, 51, 0.85);
+    border-radius: 4px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
+}
+
+input[type="range"].custom-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    border: 2px solid #000;
+    cursor: pointer;
+}
+
+#settings-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    padding: 0;
+    z-index: 10;
+}
+
+#settings-credit {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #666;
+    font-size: 11px;
+    letter-spacing: 1px;
+    z-index: 10;
+    pointer-events: none;
+    font-weight: normal;
 }
 
 /* ============================================================
@@ -291,29 +443,27 @@ html, body {
     top: 20px;
     right: 20px;
     color: #fff;
-    font-size: 22px;
+    font-size: 16px;
     font-weight: bold;
-    background: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 3px solid #333;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
     letter-spacing: 1px;
     z-index: 10;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 #shop-back {
     position: absolute;
     top: 20px;
     left: 20px;
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
     padding: 0;
     z-index: 10;
-    background: #000;
-    border-color: #333;
-    color: #fff;
 }
 
 #bike-carousel {
@@ -326,13 +476,10 @@ html, body {
 }
 
 .nav-arrow {
-    width: 60px;
-    height: 60px;
-    font-size: 28px;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
     flex-shrink: 0;
-    background: #000;
-    border-color: #333;
-    color: #fff;
 }
 
 .nav-arrow:disabled {
@@ -345,13 +492,13 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    max-width: 400px;
+    max-width: 360px;
 }
 
 #shop-bike-preview {
     position: relative;
     width: 100%;
-    max-width: 320px;
+    max-width: 280px;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
@@ -363,7 +510,6 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
     transition: opacity 0.2s;
     position: relative;
     z-index: 2;
@@ -372,7 +518,6 @@ html, body {
 .shop-wheel {
     position: absolute;
     display: none;
-    filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
     pointer-events: none;
     z-index: 1;
 }
@@ -383,15 +528,14 @@ html, body {
 
 #shop-question {
     display: none;
-    width: 200px;
-    height: 200px;
-    font-size: 180px;
+    width: 160px;
+    height: 160px;
+    font-size: 140px;
     font-weight: bold;
     color: #fff;
     text-align: center;
-    line-height: 200px;
+    line-height: 160px;
     font-family: Arial, sans-serif;
-    text-shadow: 0 0 30px rgba(255,255,255,0.6);
     z-index: 3;
 }
 
@@ -401,27 +545,25 @@ html, body {
 
 #shop-bike-name {
     color: #fff;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
-    margin-top: 15px;
-    text-shadow: 0 0 10px #fff;
+    margin-top: 12px;
     letter-spacing: 2px;
     text-align: center;
 }
 
 #shop-bike-speed {
     color: #fff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
-    margin-top: 5px;
+    margin-top: 4px;
     letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(255,255,255,0.6);
 }
 
 #shop-bike-status {
     color: #aaa;
-    font-size: 16px;
-    margin-top: 5px;
+    font-size: 13px;
+    margin-top: 4px;
     letter-spacing: 1px;
 }
 
@@ -432,36 +574,14 @@ html, body {
     gap: 10px;
     width: 100%;
     padding: 0 20px 20px 20px;
-    max-width: 400px;
+    max-width: 360px;
 }
 
 #shop-actions .btn {
     width: 100%;
-    max-width: 280px;
-    height: 60px;
-    font-size: 18px;
-}
-
-#btn-buy {
-    background: #000;
-    border-color: #333;
-    color: #fff;
-}
-
-#btn-buy:active {
-    background: #222;
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
-}
-
-#btn-select {
-    border-color: #333;
-    color: #fff;
-}
-
-#btn-select:active {
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
+    max-width: 240px;
+    height: 50px;
+    font-size: 14px;
 }
 
 /* ============================================================
@@ -481,39 +601,40 @@ html, body {
     position: fixed;
     color: #fff;
     font-weight: bold;
-    background: #000;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 2px solid #333;
-    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
     z-index: 10;
     pointer-events: none;
     letter-spacing: 1px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 #speedometer {
     top: 12px;
     right: 12px;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 #distance {
     top: 12px;
     left: 12px;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 #btn-pause {
     position: fixed;
-    top: 55px;
+    top: 50px;
     right: 12px;
-    width: 60px;
-    height: 50px;
-    font-size: 24px;
+    width: 50px;
+    height: 42px;
+    font-size: 20px;
     font-weight: bold;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     z-index: 10;
-    padding-left: 6px;
+    padding-left: 5px;
 }
 
 #stunt-earnings {
@@ -522,18 +643,19 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
-    background: #000;
-    padding: 8px 20px;
-    border-radius: 10px;
-    border: 3px solid #333;
-    text-shadow: 0 0 12px rgba(255,255,255,0.7);
+    background: rgba(0, 0, 0, 0.75);
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
     letter-spacing: 1px;
     z-index: 15;
     pointer-events: none;
     display: none;
     font-family: Arial, sans-serif;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 #stunt-earnings.visible {
@@ -543,105 +665,73 @@ html, body {
 #btn-bass {
     position: fixed;
     right: 18px;
-    bottom: 200px;
-    width: 80px;
-    height: 80px;
-    font-size: 11px;
+    bottom: 190px;
+    width: 70px;
+    height: 70px;
+    font-size: 10px;
     z-index: 20;
     display: none;
-    background: #000;
-    border-color: #333;
-    color: #fff;
-    text-shadow: 1px 1px 3px #000;
 }
 
 #btn-bass.visible {
     display: flex;
 }
 
-#btn-bass:active, #btn-bass.pressed {
-    background: #222;
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
-}
-
 #btn-bass.active-bass {
-    background: #222;
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.6);
+    background: rgba(34, 34, 34, 0.9);
+    border-color: rgba(102, 102, 102, 0.9);
     animation: bassPulse 0.8s infinite alternate;
 }
 
 @keyframes bassPulse {
-    from { box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-    to   { box-shadow: 0 0 30px rgba(255,255,255,0.7); }
+    from { background: rgba(0, 0, 0, 0.7); }
+    to   { background: rgba(50, 50, 50, 0.9); }
 }
 
 #btn-clutch {
     position: fixed;
     right: 18px;
-    bottom: 200px;
-    width: 80px;
-    height: 80px;
-    font-size: 11px;
+    bottom: 190px;
+    width: 70px;
+    height: 70px;
+    font-size: 10px;
     z-index: 20;
     display: none;
-    background: #000;
-    border-color: #333;
-    color: #fff;
-    text-shadow: 1px 1px 3px #000;
 }
 
 #btn-clutch.visible {
     display: flex;
 }
 
-#btn-clutch:active, #btn-clutch.pressed {
-    background: #222;
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
-}
-
 #btn-trick {
     position: fixed;
     right: 18px;
-    bottom: 200px;
-    width: 80px;
-    height: 80px;
-    font-size: 24px;
+    bottom: 190px;
+    width: 70px;
+    height: 70px;
+    font-size: 20px;
     font-weight: bold;
     z-index: 20;
     display: none;
-    background: #000;
-    border-color: #333;
-    color: #fff;
-    text-shadow: 1px 1px 3px #000;
 }
 
 #btn-trick.visible {
     display: flex;
 }
 
-#btn-trick:active, #btn-trick.pressed {
-    background: #222;
-    border-color: #666;
-    box-shadow: 0 0 25px rgba(255,255,255,0.4);
-}
-
 #btn-trick.active-trick {
-    background: #222;
+    background: rgba(34, 34, 34, 0.9);
     border-color: #fff;
     color: #fff;
-    box-shadow: 0 0 30px rgba(255,255,255,0.9);
 }
 
 #btn-brake {
     position: fixed;
     right: 18px;
-    bottom: 110px;
-    width: 80px;
-    height: 80px;
-    font-size: 12px;
+    bottom: 105px;
+    width: 70px;
+    height: 70px;
+    font-size: 11px;
     z-index: 20;
 }
 
@@ -649,16 +739,18 @@ html, body {
     position: fixed;
     right: 18px;
     bottom: 18px;
-    width: 80px;
-    height: 80px;
-    font-size: 12px;
+    width: 70px;
+    height: 70px;
+    font-size: 11px;
     z-index: 20;
     overflow: hidden;
     padding: 0;
     display: block;
-    background: #000;
-    border: 3px solid #333;
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(51, 51, 51, 0.85);
+    border-radius: 8px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 #gas-zone-high {
@@ -670,12 +762,11 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     color: #fff;
-    text-shadow: 1px 1px 3px #000;
     z-index: 3;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid rgba(51, 51, 51, 0.85);
     letter-spacing: 1px;
     background: transparent;
 }
@@ -689,10 +780,9 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     color: #fff;
-    text-shadow: 1px 1px 3px #000;
     z-index: 3;
     letter-spacing: 1px;
     background: transparent;
@@ -743,29 +833,29 @@ html, body {
 }
 
 #pause-screen h2 {
-    font-size: 42px;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px #fff;
+    font-size: 28px;
+    margin-bottom: 16px;
     letter-spacing: 3px;
 }
 
 #pause-earnings {
-    font-size: 26px;
+    font-size: 18px;
     color: #fff;
-    margin-bottom: 30px;
-    text-shadow: 0 0 15px rgba(255,255,255,0.7);
+    margin-bottom: 24px;
     letter-spacing: 1px;
-    background: #000;
-    padding: 10px 25px;
-    border-radius: 10px;
-    border: 3px solid #333;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 2px solid rgba(51, 51, 51, 0.85);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 #pause-screen .btn {
-    width: 220px;
-    height: 60px;
-    font-size: 18px;
-    margin-top: 15px;
+    width: 180px;
+    height: 50px;
+    font-size: 14px;
+    margin-top: 12px;
 }
 
 /* ============================================================
@@ -793,53 +883,65 @@ html, body {
 }
 
 #gameover h1 {
-    font-size: 42px;
+    font-size: 32px;
     color: #fff;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px #fff;
+    margin-bottom: 16px;
     letter-spacing: 3px;
 }
 
 #gameover p {
-    font-size: 20px;
-    margin-bottom: 10px;
+    font-size: 15px;
+    margin-bottom: 8px;
 }
 
 #gameover .money-earned {
-    font-size: 26px;
+    font-size: 20px;
     color: #fff;
-    margin: 20px 0;
-    text-shadow: 0 0 15px rgba(255,255,255,0.7);
+    margin: 16px 0;
 }
 
 #gameover .btn {
-    margin-top: 15px;
-    width: 220px;
-    height: 60px;
-    font-size: 18px;
+    margin-top: 12px;
+    width: 180px;
+    height: 50px;
+    font-size: 14px;
 }
 
 @media (orientation: landscape) {
-    #loading-wheel { width: 80px; height: 80px; margin-bottom: 25px; }
-    #loading-progress-container { height: 16px; }
-    #btn-bass { width: 70px; height: 70px; font-size: 10px; right: 12px; bottom: 182px; }
-    #btn-clutch { width: 70px; height: 70px; font-size: 10px; right: 12px; bottom: 182px; }
-    #btn-trick { width: 70px; height: 70px; font-size: 22px; right: 12px; bottom: 182px; }
-    #btn-brake { width: 70px; height: 70px; font-size: 11px; right: 12px; bottom: 92px; }
-    #btn-gas { width: 70px; height: 70px; right: 12px; bottom: 12px; }
+    #loading-wheel { width: 70px; height: 70px; margin-bottom: 20px; }
+    #loading-progress-container { height: 14px; }
+    #loading-text { font-size: 11px; }
+    #loading-percent { font-size: 10px; }
+    #btn-bass { width: 60px; height: 60px; font-size: 9px; right: 12px; bottom: 172px; }
+    #btn-clutch { width: 60px; height: 60px; font-size: 9px; right: 12px; bottom: 172px; }
+    #btn-trick { width: 60px; height: 60px; font-size: 18px; right: 12px; bottom: 172px; }
+    #btn-brake { width: 60px; height: 60px; font-size: 10px; right: 12px; bottom: 92px; }
+    #btn-gas { width: 60px; height: 60px; right: 12px; bottom: 12px; }
     #gas-zone-high, #gas-zone-low { font-size: 9px; }
-    #speedometer { font-size: 16px; }
-    #distance { font-size: 14px; }
-    #btn-pause { width: 52px; height: 44px; font-size: 20px; top: 50px; right: 12px; }
-    #stunt-earnings { font-size: 20px; padding: 6px 16px; }
-    #pause-earnings { font-size: 22px; padding: 8px 20px; }
-    #shop-bike-preview { max-width: 240px; }
-    #shop-bike-name { font-size: 18px; }
-    #shop-question { width: 150px; height: 150px; font-size: 130px; line-height: 150px; }
-    #menu-title .line1 { font-size: 48px; }
-    #menu-title .line2 { font-size: 40px; }
-    #menu-title .line3 { font-size: 32px; }
-    #menu-buttons .btn { width: 200px; height: 60px; font-size: 18px; }
+    #speedometer { font-size: 13px; }
+    #distance { font-size: 12px; }
+    #btn-pause { width: 44px; height: 38px; font-size: 18px; top: 44px; right: 12px; }
+    #stunt-earnings { font-size: 15px; padding: 5px 12px; }
+    #pause-earnings { font-size: 15px; padding: 6px 16px; }
+    #pause-screen h2 { font-size: 22px; }
+    #shop-bike-preview { max-width: 200px; }
+    #shop-bike-name { font-size: 15px; }
+    #shop-bike-speed { font-size: 11px; }
+    #shop-bike-status { font-size: 12px; }
+    #shop-question { width: 130px; height: 130px; font-size: 110px; line-height: 130px; }
+    #menu-title .line1 { font-size: 58px; }
+    #menu-title .line2 { font-size: 48px; }
+    #menu-title .line3 { font-size: 40px; }
+    #menu-buttons .btn { width: 170px; height: 48px; font-size: 14px; }
+    #btn-settings { width: 36px; height: 36px; font-size: 16px; top: 12px; right: 12px; }
+    #settings-title { font-size: 22px; margin-bottom: 20px; }
+    .setting-label { font-size: 13px; }
+    .setting-value { font-size: 12px; }
+    #settings-credit { font-size: 10px; bottom: 12px; }
+    #gameover h1 { font-size: 26px; }
+    #gameover p { font-size: 13px; }
+    #gameover .money-earned { font-size: 17px; }
+    #gameover .btn { width: 160px; height: 44px; font-size: 13px; }
 }
 </style>
 </head>
@@ -869,6 +971,39 @@ html, body {
     <div id="menu-buttons">
         <button id="btn-play" class="btn">ИГРАТЬ</button>
         <button id="btn-shop" class="btn">МАГАЗИН</button>
+    </div>
+    
+    <button id="btn-settings" class="btn">⚙</button>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="settings-screen" class="screen">
+    <img id="settings-bg" src="menu.png" alt="">
+    <div id="settings-content">
+        <button id="settings-back" class="btn">←</button>
+        <div id="settings-title">НАСТРОЙКИ</div>
+        
+        <div class="setting-block">
+            <div class="setting-label">
+                <span>ЛУЧИ</span>
+                <span class="setting-value" id="rays-value">50%</span>
+            </div>
+            <div class="slider-container">
+                <input type="range" class="custom-slider" id="slider-rays" min="0" max="100" value="50">
+            </div>
+        </div>
+        
+        <div class="setting-block">
+            <div class="setting-label">
+                <span>НОЧЬ</span>
+                <span class="setting-value" id="night-value">0%</span>
+            </div>
+            <div class="slider-container">
+                <input type="range" class="custom-slider" id="slider-night" min="0" max="100" value="0">
+            </div>
+        </div>
+        
+        <div id="settings-credit">телеграм разработчика - @rezzzistor</div>
     </div>
 </div>
 
@@ -1011,7 +1146,6 @@ const BIKES = [
 ];
 
 const ASSETS = {
-    background: 'background.png',
     engine: 'sound.mp3',
     engineStunt: 'sound_stunt.mp3',
     engineCar: 'sound7.mp3',
@@ -1019,14 +1153,30 @@ const ASSETS = {
     menuSound: 'menu_sound.mp3',
     bike7Sound: 'bike7.mp3',
     crash: '',
-    menu: 'menu.png'
+    // Фоны
+    menu1: 'menu.png',
+    menu2: 'menu2.png',
+    bg1: 'background.png',
+    bg2: 'background2.png'
 };
+
+// ============================================================
+// РАНДОМНЫЙ ФОН МЕНЮ
+// ============================================================
+const menuBgList = [ASSETS.menu1, ASSETS.menu2];
+const chosenMenuBg = menuBgList[Math.floor(Math.random() * menuBgList.length)];
+
+// Фоны игры
+const gameBgList = [ASSETS.bg1, ASSETS.bg2];
 
 // ============================================================
 // СОХРАНЕНИЕ
 // ============================================================
 const SAVE_KEY = 'pitbike_save_v4';
 let save = { money: 0, ownedBikes: ['stock'], selectedBike: 'stock' };
+
+const SETTINGS_KEY = 'pitbike_settings_v1';
+let settings = { rays: 50, night: 0 };
 
 function loadSave() {
     try {
@@ -1042,7 +1192,29 @@ function loadSave() {
 function persistSave() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
 }
+
+function loadSettings() {
+    try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (raw) {
+            const data = JSON.parse(raw);
+            if (data.rays !== undefined) settings.rays = data.rays;
+            if (data.night !== undefined) settings.night = data.night;
+        }
+    } catch (e) {}
+}
+function persistSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {}
+}
+
 loadSave();
+loadSettings();
+
+// Применяем рандомный фон меню сразу
+document.getElementById('menu-bg').src = chosenMenuBg;
+document.getElementById('menu-bg-overlay').src = chosenMenuBg;
+document.getElementById('settings-bg').src = chosenMenuBg;
+document.getElementById('shop-bg').src = chosenMenuBg;
 
 // ============================================================
 // CANVAS
@@ -1060,12 +1232,19 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 
 // ============================================================
-// ЗАГРУЗКА КАРТИНОК С ПРОГРЕССОМ
+// ЗАГРУЗКА КАРТИНОК
 // ============================================================
-const images = { bike: null, wheel: null, bikeWheel: null, background: null, trick: null };
+const images = { 
+    bike: null, 
+    wheel: null, 
+    bikeWheel: null, 
+    background: null, 
+    background2: null,
+    trick: null 
+};
 
 const PRELOAD_IMAGES = [
-    'menu.png', 'background.png',
+    'menu.png', 'menu2.png', 'background.png', 'background2.png',
     'bike.png', 'bike2.png', 'bike3.png', 'bike4.png', 'bike5.png', 'bike6.png', 'bike6_1.png', 'bike7.png',
     'wheel_bike.png', 'wheel_bike6.png', 'wheel_bike7.png'
 ];
@@ -1087,6 +1266,10 @@ function preloadAllImages() {
     PRELOAD_IMAGES.forEach(src => {
         const img = new Image();
         img.onload = () => {
+            // Запоминаем фоны отдельно
+            if (src === 'background.png') images.background = img;
+            if (src === 'background2.png') images.background2 = img;
+            
             loadingLoaded++;
             updateLoadingProgress();
             if (loadingLoaded >= loadingTotal) {
@@ -1176,9 +1359,6 @@ function initSound() {
     startMenuSound();
 }
 
-// ============================================================
-// МУЗЫКА МЕНЮ
-// ============================================================
 function startMenuSound() {
     if (!menuSound) return;
     if (menuSoundPlaying && !menuSound.paused) return;
@@ -1212,9 +1392,6 @@ function fadeOutMenuSound(duration = 1200) {
     }, stepTime);
 }
 
-// ============================================================
-// ЗВУК ГАЗА
-// ============================================================
 let engineFadeInterval = null;
 let engineFadeStuntInterval = null;
 let engineFadeCarInterval = null;
@@ -1357,9 +1534,6 @@ function resumeBackground() {
     if (backgroundSound.paused) backgroundSound.play().catch(() => {});
 }
 
-// ============================================================
-// МУЗЫКА
-// ============================================================
 function toggleBass() {
     if (!bike7Sound) return;
     if (bassPlaying) {
@@ -1395,22 +1569,26 @@ const CONFIG = {
     clutchStuntBoost: 8.0, clutchChargeTime: 500,
     stuntLeanSpeed: 1.2,
     stuntDecayPerFrame: 0.002,
-    stuntReturnSpeed: 0.012,         // ← медленный возврат (было 0.05)
+    stuntReturnSpeed: 0.012,
     stuntScorePerSec: 100, stuntCompleteBonus: 500,
     
     gasLevelHigh: 1.0,
     gasLevelLow: 0.45,
     
-    stuntStabilizeSpeed: 0.06,       // ← мягче стабилизация (было 0.15)
+    stuntStabilizeSpeed: 0.06,
     stuntStabilizeMinAngle: 35,
     stuntStabilizeMaxAngle: 75,
     
     bicycleStuntLeanSpeed: 0.8,
     bicycleStuntBoost: 6.0,
     
-    // ─── Плавное опускание байка ───
-    gravityPullSlow: 0.03,           // медленная гравитация в станте
-    returnEaseSpeed: 0.008
+    gravityPullSlow: 0.03,
+    returnEaseSpeed: 0.008,
+    
+    motionBlurAlpha: 0.35,
+    
+    // ─── Смена фона игры каждые 700 метров ───
+    bgChangeDistance: 700
 };
 
 const game = {
@@ -1427,7 +1605,12 @@ const game = {
     stuntScoreEarned: 0, stuntReturnedCleanly: false,
     gasMode: 'none',
     currentAcceleration: 0.005,
-    isTrick: false
+    isTrick: false,
+    rayOffset: 0,
+    
+    // ─── Текущий фон игры ───
+    currentBgIndex: 0,
+    nextBgChangeAt: 700   // при каком расстоянии меняем
 };
 
 const bike = { x: 0, y: 0, width: 400, height: 400, pivotX: 0.18, pivotY: 0.88 };
@@ -1440,21 +1623,29 @@ function updateBikePosition() {
     bike.height = bike.width;
 }
 
-// ============================================================
-// ЭКРАНЫ
-// ============================================================
+function getCurrentGameBg() {
+    const idx = game.currentBgIndex % gameBgList.length;
+    const src = gameBgList[idx];
+    if (src === ASSETS.bg1) return images.background;
+    if (src === ASSETS.bg2) return images.background2;
+    return images.background;
+}
+
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    
+    setTimeout(() => {
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+    }, 50);
     
     if (id === 'shop-screen') { updateShopUI(); game.isRunning = false; }
-    if (id === 'game-screen') { startGame(); }
+    if (id === 'game-screen') { 
+        setTimeout(() => startGame(), 100);
+    }
     if (id === 'menu-screen') { game.isRunning = false; stopBass(); startMenuSound(); }
 }
 
-// ============================================================
-// КНОПКИ
-// ============================================================
 function onButtonClick(btn, callback) {
     let touched = false;
     btn.addEventListener('touchstart', (e) => { e.preventDefault(); touched = true; btn.classList.add('pressed'); }, { passive: false });
@@ -1470,9 +1661,38 @@ function onButtonClick(btn, callback) {
 onButtonClick(document.getElementById('btn-play'), () => { initSound(); fadeOutMenuSound(1200); showScreen('game-screen'); });
 onButtonClick(document.getElementById('btn-shop'), () => { initSound(); showScreen('shop-screen'); });
 
-// ============================================================
-// ПАУЗА
-// ============================================================
+onButtonClick(document.getElementById('btn-settings'), () => {
+    initSound();
+    document.getElementById('slider-rays').value = settings.rays;
+    document.getElementById('rays-value').textContent = settings.rays + '%';
+    document.getElementById('slider-night').value = settings.night;
+    document.getElementById('night-value').textContent = settings.night + '%';
+    showScreen('settings-screen');
+});
+
+onButtonClick(document.getElementById('settings-back'), () => {
+    persistSettings();
+    showScreen('menu-screen');
+});
+
+const sliderRays = document.getElementById('slider-rays');
+sliderRays.addEventListener('input', () => {
+    settings.rays = parseInt(sliderRays.value);
+    document.getElementById('rays-value').textContent = settings.rays + '%';
+});
+sliderRays.addEventListener('change', () => {
+    persistSettings();
+});
+
+const sliderNight = document.getElementById('slider-night');
+sliderNight.addEventListener('input', () => {
+    settings.night = parseInt(sliderNight.value);
+    document.getElementById('night-value').textContent = settings.night + '%';
+});
+sliderNight.addEventListener('change', () => {
+    persistSettings();
+});
+
 const pauseEarningsEl = document.getElementById('pause-earnings');
 
 onButtonClick(document.getElementById('btn-pause'), () => {
@@ -1509,9 +1729,6 @@ onButtonClick(document.getElementById('btn-pause-menu'), () => {
     showScreen('menu-screen');
 });
 
-// ============================================================
-// МАГАЗИН
-// ============================================================
 let shopIndex = 0;
 function getCurrentBike() { return BIKES[shopIndex]; }
 function isOwned(bikeId) { return save.ownedBikes.includes(bikeId); }
@@ -1633,9 +1850,6 @@ onButtonClick(document.getElementById('btn-select'), () => {
 
 onButtonClick(document.getElementById('shop-back'), () => showScreen('menu-screen'));
 
-// ============================================================
-// УПРАВЛЕНИЕ В ИГРЕ
-// ============================================================
 const btnGas = document.getElementById('btn-gas');
 const btnBrake = document.getElementById('btn-brake');
 const btnBass = document.getElementById('btn-bass');
@@ -1757,7 +1971,6 @@ bindButton(btnClutch,
     }
 );
 
-// ─── КНОПКА "1" — ТРЮК ВЕЛОСИПЕДА (ТАП = ВКЛ/ВЫКЛ) ───
 let trickTouched = false;
 
 btnTrick.addEventListener('touchstart', (e) => {
@@ -1841,9 +2054,6 @@ document.addEventListener('keyup', (e) => {
     }
 });
 
-// ============================================================
-// СТАРТ
-// ============================================================
 function startGame() {
     game.bikeAngle = 0; game.worldOffset = 0; game.speed = 0;
     game.isGas = false; game.isBrake = false; game.isGameOver = false; game.isPaused = false;
@@ -1856,6 +2066,11 @@ function startGame() {
     game.stuntSessionEarnings = 0; game.stuntScoreEarned = 0; game.stuntReturnedCleanly = false;
     game.gasMode = 'none';
     game.isTrick = false;
+    game.rayOffset = 0;
+    
+    // Начинаем с первого фона
+    game.currentBgIndex = 0;
+    game.nextBgChangeAt = CONFIG.bgChangeDistance;
     
     btnTrick.classList.remove('active-trick');
     
@@ -1906,12 +2121,6 @@ function startGame() {
     
     images.trick = null;
     
-    if (!images.background) {
-        const bgImg = new Image();
-        bgImg.onload = () => { images.background = bgImg; };
-        bgImg.src = ASSETS.background;
-    }
-    
     if (currentBackgroundSound === 'default') resumeBackground();
     else stopBackground();
     
@@ -1922,9 +2131,6 @@ function startGame() {
     requestAnimationFrame(gameLoop);
 }
 
-// ============================================================
-// ЛОГИКА
-// ============================================================
 function update(delta) {
     if (game.isGameOver || !game.isRunning || game.isPaused) return;
 
@@ -1951,6 +2157,8 @@ function update(delta) {
     
     gasFill.style.height = (game.gasLevel * 100) + '%';
 
+    game.rayOffset += delta * 0.02;
+
     if (isBike || isScooter) {
         if (game.bikeAngle <= -CONFIG.fallAngle) {
             game.bikeAngle = -CONFIG.fallAngle;
@@ -1975,7 +2183,6 @@ function update(delta) {
                 game.inStunt = true;
                 game.stuntWasActive = true;
             } else {
-                // ─── ПЛАВНЫЙ ВОЗВРАТ К 0 (медленный) ───
                 game.bikeAngle *= (1 - CONFIG.stuntReturnSpeed);
                 if (game.bikeAngle > -1) game.bikeAngle = 0;
                 if (game.inStunt) game.inStunt = false;
@@ -1990,13 +2197,10 @@ function update(delta) {
                 }
             }
             
-            // ─── ПЛАВНАЯ ГРАВИТАЦИЯ ───
             if (game.bikeAngle < 0) {
                 if (game.inStunt) {
-                    // В станте — очень мягкая гравитация
                     game.bikeAngle -= CONFIG.gravityPullSlow * (Math.abs(game.bikeAngle) / 90);
                 } else {
-                    // Вне станта — обычная
                     game.bikeAngle -= CONFIG.gravityPull * (Math.abs(game.bikeAngle) / 90);
                 }
             }
@@ -2112,10 +2316,14 @@ function update(delta) {
     if (game.wheelRotation > Math.PI * 2) game.wheelRotation -= Math.PI * 2;
 
     game.worldOffset += game.speed * CONFIG.roadMultiplier;
-    const bgW = images.background ? images.background.width : 800;
-    if (game.worldOffset >= bgW) game.worldOffset -= bgW;
-
+    
     game.distance += game.speed * 0.05;
+    
+    // ─── Смена фона игры каждые 700 метров ───
+    if (game.distance >= game.nextBgChangeAt) {
+        game.currentBgIndex++;
+        game.nextBgChangeAt += CONFIG.bgChangeDistance;
+    }
 
     if (isBike || isScooter) {
         const metersThisFrame = game.speed * 0.05;
@@ -2141,32 +2349,119 @@ function update(delta) {
     document.getElementById('distance').textContent = Math.floor(game.distance) + ' м';
 }
 
-// ============================================================
-// ОТРИСОВКА
-// ============================================================
+let blurBuffer = null;
+let blurBufferCtx = null;
+
 function draw() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, W, H);
 
-    if (images.background) {
-        const bgW = Math.max(W, images.background.width);
-        const bgH = H;
-        let bgX = -(game.worldOffset % bgW);
-        ctx.drawImage(images.background, bgX, 0, bgW, bgH);
-        ctx.drawImage(images.background, bgX + bgW, 0, bgW, bgH);
-    } else {
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#4a6a8a');
-        grad.addColorStop(1, '#222');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, H);
+    if (!blurBuffer || blurBuffer.width !== W || blurBuffer.height !== H) {
+        blurBuffer = document.createElement('canvas');
+        blurBuffer.width = W;
+        blurBuffer.height = H;
+        blurBufferCtx = blurBuffer.getContext('2d');
     }
 
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = W;
+    tempCanvas.height = H;
+    const tempCtx = tempCanvas.getContext('2d');
+    drawEverything(tempCtx);
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    
+    ctx.globalAlpha = 1 - CONFIG.motionBlurAlpha;
+    ctx.drawImage(blurBuffer, 0, 0);
+    
+    ctx.globalAlpha = CONFIG.motionBlurAlpha * 1.5;
+    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.globalAlpha = 1;
+
+    blurBufferCtx.clearRect(0, 0, W, H);
+    blurBufferCtx.drawImage(tempCanvas, 0, 0);
+}
+
+function drawEverything(c) {
+    c.clearRect(0, 0, W, H);
+
+    // ТЕКУЩИЙ ФОН ИГРЫ (меняется каждые 700 метров)
+    const currentBg = getCurrentGameBg();
+    
+    if (currentBg) {
+        const bgW = Math.max(W, currentBg.width);
+        const bgH = H;
+        
+        // Прокрутка фона
+        const localOffset = game.worldOffset % bgW;
+        let bgX = -localOffset;
+        
+        c.drawImage(currentBg, bgX, 0, bgW, bgH);
+        c.drawImage(currentBg, bgX + bgW, 0, bgW, bgH);
+    } else {
+        const grad = c.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#4a6a8a');
+        grad.addColorStop(1, '#222');
+        c.fillStyle = grad;
+        c.fillRect(0, 0, W, H);
+    }
+
+    // НОЧЬ
+    const nightAlpha = settings.night / 100;
+    if (nightAlpha > 0.01) {
+        c.fillStyle = `rgba(0, 5, 25, ${nightAlpha * 0.85})`;
+        c.fillRect(0, 0, W, H);
+    }
+
+    // ЛУЧИ
+    const raysValue = settings.rays / 100;
+    if (raysValue > 0.01) {
+        c.globalCompositeOperation = 'lighten';
+        c.fillStyle = `rgba(255, 240, 200, ${raysValue * 0.25})`;
+        c.fillRect(0, 0, W, H);
+        c.globalCompositeOperation = 'source-over';
+        
+        c.save();
+        c.globalCompositeOperation = 'lighter';
+        
+        const rayCount = 8;
+        const rayWidth = W / 4;
+        
+        for (let i = 0; i < rayCount; i++) {
+            const x = (i * rayWidth * 1.5 - game.rayOffset * 20) % (W * 2) - W / 2;
+            const alpha = raysValue * 0.12 * (0.6 + Math.random() * 0.4);
+            
+            const grad = c.createLinearGradient(x, 0, x + rayWidth, H);
+            grad.addColorStop(0, `rgba(255, 240, 180, 0)`);
+            grad.addColorStop(0.5, `rgba(255, 240, 180, ${alpha})`);
+            grad.addColorStop(1, `rgba(255, 240, 180, 0)`);
+            
+            c.fillStyle = grad;
+            c.beginPath();
+            c.moveTo(x, 0);
+            c.lineTo(x + rayWidth * 0.6, 0);
+            c.lineTo(x + rayWidth * 1.2, H);
+            c.lineTo(x + rayWidth * 0.4, H);
+            c.closePath();
+            c.fill();
+        }
+        
+        const sunGrad = c.createRadialGradient(W * 0.7, H * 0.1, 0, W * 0.7, H * 0.1, H * 0.5);
+        sunGrad.addColorStop(0, `rgba(255, 240, 200, ${raysValue * 0.5})`);
+        sunGrad.addColorStop(0.5, `rgba(255, 220, 150, ${raysValue * 0.15})`);
+        sunGrad.addColorStop(1, 'rgba(255, 220, 150, 0)');
+        c.fillStyle = sunGrad;
+        c.fillRect(0, 0, W, H);
+        
+        c.restore();
+    }
+
+    // ДЫМ
     for (const p of game.smoke) {
-        ctx.fillStyle = `rgba(200, 200, 200, ${p.life * 0.4})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
+        c.fillStyle = `rgba(200, 200, 200, ${p.life * 0.4})`;
+        c.beginPath();
+        c.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        c.fill();
     }
 
     const pivotCanvasX = bike.x + bike.width * bike.pivotX;
@@ -2174,56 +2469,58 @@ function draw() {
     const isCar = game.currentType === 'car';
     const bd = game.currentBikeData;
 
+    // КОЛЁСА
     if (!isCar && images.bikeWheel && bd && bd.hasWheels) {
-        ctx.save();
-        ctx.translate(pivotCanvasX, pivotCanvasY);
-        ctx.rotate(game.bikeAngle * Math.PI / 180);
-        ctx.translate(-pivotCanvasX, -pivotCanvasY);
+        c.save();
+        c.translate(pivotCanvasX, pivotCanvasY);
+        c.rotate(game.bikeAngle * Math.PI / 180);
+        c.translate(-pivotCanvasX, -pivotCanvasY);
         
         const rearR = bike.width * bd.rearWheelRadius;
         const rearX = bike.x + bike.width * bd.rearWheelX;
         const rearY = bike.y - bike.height + bike.height * bd.rearWheelY;
-        ctx.save();
-        ctx.translate(rearX, rearY);
-        ctx.rotate(game.wheelRotation);
-        ctx.drawImage(images.bikeWheel, -rearR, -rearR, rearR * 2, rearR * 2);
-        ctx.restore();
+        c.save();
+        c.translate(rearX, rearY);
+        c.rotate(game.wheelRotation);
+        c.drawImage(images.bikeWheel, -rearR, -rearR, rearR * 2, rearR * 2);
+        c.restore();
         
         const frontR = bike.width * bd.frontWheelRadius;
         const frontX = bike.x + bike.width * bd.frontWheelX;
         const frontY = bike.y - bike.height + bike.height * bd.frontWheelY;
-        ctx.save();
-        ctx.translate(frontX, frontY);
-        ctx.rotate(game.wheelRotation);
-        ctx.drawImage(images.bikeWheel, -frontR, -frontR, frontR * 2, frontR * 2);
-        ctx.restore();
+        c.save();
+        c.translate(frontX, frontY);
+        c.rotate(game.wheelRotation);
+        c.drawImage(images.bikeWheel, -frontR, -frontR, frontR * 2, frontR * 2);
+        c.restore();
         
-        ctx.restore();
+        c.restore();
     }
     
     if (isCar && images.wheel && bd) {
         const wheelR = bike.width * bd.wheelRadius;
         const frontX = bike.x + bike.width * bd.wheelFrontX;
         const frontY = bike.y - bike.height + bike.height * bd.wheelFrontY;
-        ctx.save();
-        ctx.translate(frontX, frontY);
-        ctx.rotate(game.wheelRotation);
-        ctx.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
-        ctx.restore();
+        c.save();
+        c.translate(frontX, frontY);
+        c.rotate(game.wheelRotation);
+        c.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
+        c.restore();
         
         const backX = bike.x + bike.width * bd.wheelBackX;
         const backY = bike.y - bike.height + bike.height * bd.wheelBackY;
-        ctx.save();
-        ctx.translate(backX, backY);
-        ctx.rotate(game.wheelRotation);
-        ctx.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
-        ctx.restore();
+        c.save();
+        c.translate(backX, backY);
+        c.rotate(game.wheelRotation);
+        c.drawImage(images.wheel, -wheelR, -wheelR, wheelR * 2, wheelR * 2);
+        c.restore();
     }
 
-    ctx.save();
-    ctx.translate(pivotCanvasX, pivotCanvasY);
-    ctx.rotate(game.bikeAngle * Math.PI / 180);
-    ctx.translate(-pivotCanvasX, -pivotCanvasY);
+    // КУЗОВ
+    c.save();
+    c.translate(pivotCanvasX, pivotCanvasY);
+    c.rotate(game.bikeAngle * Math.PI / 180);
+    c.translate(-pivotCanvasX, -pivotCanvasY);
 
     let bikeImageToDraw = images.bike;
     if (game.currentType === 'bicycle' && game.isTrick && images.trick) {
@@ -2239,47 +2536,45 @@ function draw() {
             const bodyH = bike.height * bodyScaleY;
             const centerX = bike.x + bike.width / 2;
             const centerY = bike.y - bike.height / 2;
-            ctx.drawImage(bikeImageToDraw, centerX - bodyW / 2, centerY - bodyH / 2 + bodyOffsetPx, bodyW, bodyH);
+            c.drawImage(bikeImageToDraw, centerX - bodyW / 2, centerY - bodyH / 2 + bodyOffsetPx, bodyW, bodyH);
         } else {
-            ctx.drawImage(bikeImageToDraw, bike.x, bike.y - bike.height, bike.width, bike.height);
+            c.drawImage(bikeImageToDraw, bike.x, bike.y - bike.height, bike.width, bike.height);
         }
     } else {
-        ctx.fillStyle = '#ff6600';
-        ctx.fillRect(bike.x, bike.y - bike.height, bike.width, bike.height);
+        c.fillStyle = '#ff6600';
+        c.fillRect(bike.x, bike.y - bike.height, bike.width, bike.height);
     }
 
-    ctx.restore();
+    c.restore();
 
+    // ИСКРЫ
     for (const s of game.carSparks) {
-        ctx.globalAlpha = s.life * 0.4;
-        ctx.fillStyle = s.color;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = s.life;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fill();
+        c.globalAlpha = s.life * 0.4;
+        c.fillStyle = s.color;
+        c.beginPath();
+        c.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        c.fill();
+        c.globalAlpha = s.life;
+        c.beginPath();
+        c.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        c.fill();
     }
-    ctx.globalAlpha = 1;
+    c.globalAlpha = 1;
 
     for (const s of game.sparks) {
-        ctx.fillStyle = s.color;
-        ctx.globalAlpha = s.life;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = s.life * 0.3;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
-        ctx.fill();
+        c.fillStyle = s.color;
+        c.globalAlpha = s.life;
+        c.beginPath();
+        c.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        c.fill();
+        c.globalAlpha = s.life * 0.3;
+        c.beginPath();
+        c.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        c.fill();
     }
-    ctx.globalAlpha = 1;
+    c.globalAlpha = 1;
 }
 
-// ============================================================
-// ЦИКЛ
-// ============================================================
 let lastTime = 0;
 function gameLoop(timestamp) {
     if (!game.isRunning || game.isPaused) return;
@@ -2292,9 +2587,6 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
-// ============================================================
-// КОНЕЦ ИГРЫ
-// ============================================================
 function gameOver() {
     if (game.isGameOver) return;
     game.isGameOver = true;
@@ -2329,9 +2621,6 @@ onButtonClick(document.getElementById('btn-menu'), () => {
 document.addEventListener('touchstart', initSound, { once: true });
 document.addEventListener('click', initSound, { once: true });
 
-// ============================================================
-// ЗАПУСК
-// ============================================================
 resize();
 preloadAllImages();
 </script>
