@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Pitbike Stunt</title>
+<title>Bike Life</title>
 <style>
 * {
     margin: 0;
@@ -24,34 +24,46 @@ html, body {
 }
 
 .btn {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    background: rgba(0, 0, 0, 0.28);
+    border: none;
     border-radius: 8px;
     color: #fff;
     font-weight: bold;
     font-family: Arial, sans-serif;
     cursor: pointer;
     letter-spacing: 1px;
-    transition: transform 0.05s, background 0.1s, border-color 0.1s;
+    transition: transform 0.05s, background 0.1s;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     position: relative;
     z-index: 10;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 .btn:active, .btn.pressed {
-    background: rgba(34, 34, 34, 0.9);
+    background: rgba(255, 255, 255, 0.12);
     transform: scale(0.96);
-    border-color: rgba(102, 102, 102, 0.9);
 }
 
 .btn:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: default;
+}
+
+.toggle-btn {
+    min-width: 100px;
+    height: 40px;
+    padding: 0 16px;
+    font-size: 13px;
+    background: rgba(0, 0, 0, 0.28);
+    color: #fff;
+}
+
+.toggle-btn:active, .toggle-btn.pressed {
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .screen {
@@ -72,9 +84,41 @@ html, body {
     pointer-events: auto;
 }
 
-/* ============================================================
-   ЭКРАН ЗАГРУЗКИ
-   ============================================================ */
+#domain-lock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+#domain-lock.active {
+    display: flex;
+}
+
+#domain-lock h1 {
+    font-size: 28px;
+    color: #ff3333;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+}
+
+#domain-lock p {
+    font-size: 14px;
+    color: #888;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
 #loading-screen {
     position: fixed;
     top: 0;
@@ -111,8 +155,8 @@ html, body {
     width: 60%;
     max-width: 260px;
     height: 16px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #fff;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
     border-radius: 4px;
     overflow: hidden;
 }
@@ -139,9 +183,6 @@ html, body {
     letter-spacing: 1px;
 }
 
-/* ============================================================
-   МЕНЮ
-   ============================================================ */
 #menu-screen {
     background: #000;
     overflow: hidden;
@@ -264,9 +305,6 @@ html, body {
     z-index: 20;
 }
 
-/* ============================================================
-   НАСТРОЙКИ
-   ============================================================ */
 #settings-screen {
     background: #000;
     overflow: hidden;
@@ -301,38 +339,44 @@ html, body {
     color: #fff;
     font-size: 28px;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     letter-spacing: 3px;
+    text-align: center;
 }
 
 .setting-block {
-    width: 90%;
+    width: 100%;
     max-width: 360px;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .setting-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     color: #fff;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
+    margin-bottom: 14px;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .setting-value {
     color: #fff;
-    font-size: 13px;
-    min-width: 45px;
-    text-align: right;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
 .slider-container {
-    width: 100%;
+    width: 60%;
+    max-width: 200px;
     height: 36px;
     position: relative;
+    margin: 0 auto;
 }
 
 input[type="range"].custom-slider {
@@ -347,39 +391,46 @@ input[type="range"].custom-slider {
 
 input[type="range"].custom-slider::-webkit-slider-runnable-track {
     width: 100%;
-    height: 7px;
-    background: rgba(51, 51, 51, 0.85);
+    height: 6px;
+    background: rgba(255, 255, 255, 0.18);
     border-radius: 4px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    border: none;
 }
 
 input[type="range"].custom-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     background: #fff;
     border-radius: 50%;
-    margin-top: -11px;
-    border: 2px solid #000;
+    margin-top: -10px;
+    border: none;
     cursor: pointer;
 }
 
 input[type="range"].custom-slider::-moz-range-track {
     width: 100%;
-    height: 7px;
-    background: rgba(51, 51, 51, 0.85);
+    height: 6px;
+    background: rgba(255, 255, 255, 0.18);
     border-radius: 4px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    border: none;
 }
 
 input[type="range"].custom-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     background: #fff;
     border-radius: 50%;
-    border: 2px solid #000;
+    border: none;
     cursor: pointer;
+}
+
+.toggle-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 #settings-back {
@@ -407,9 +458,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     font-weight: normal;
 }
 
-/* ============================================================
-   МАГАЗИН
-   ============================================================ */
 #shop-screen {
     background: #000;
 }
@@ -445,14 +493,14 @@ input[type="range"].custom-slider::-moz-range-thumb {
     color: #fff;
     font-size: 16px;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.28);
     padding: 8px 16px;
     border-radius: 8px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    border: none;
     letter-spacing: 1px;
     z-index: 10;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #shop-back {
@@ -584,9 +632,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     font-size: 14px;
 }
 
-/* ============================================================
-   ИГРА
-   ============================================================ */
 #game-screen {
     background: #000;
 }
@@ -601,15 +646,15 @@ input[type="range"].custom-slider::-moz-range-thumb {
     position: fixed;
     color: #fff;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.28);
     padding: 5px 10px;
     border-radius: 6px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    border: none;
     z-index: 10;
     pointer-events: none;
     letter-spacing: 1px;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #speedometer {
@@ -645,17 +690,17 @@ input[type="range"].custom-slider::-moz-range-thumb {
     color: #fff;
     font-size: 18px;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.3);
     padding: 6px 16px;
     border-radius: 8px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    border: none;
     letter-spacing: 1px;
     z-index: 15;
     pointer-events: none;
     display: none;
     font-family: Arial, sans-serif;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #stunt-earnings.visible {
@@ -678,14 +723,13 @@ input[type="range"].custom-slider::-moz-range-thumb {
 }
 
 #btn-bass.active-bass {
-    background: rgba(34, 34, 34, 0.9);
-    border-color: rgba(102, 102, 102, 0.9);
+    background: rgba(255, 255, 255, 0.12);
     animation: bassPulse 0.8s infinite alternate;
 }
 
 @keyframes bassPulse {
-    from { background: rgba(0, 0, 0, 0.7); }
-    to   { background: rgba(50, 50, 50, 0.9); }
+    from { background: rgba(0, 0, 0, 0.28); }
+    to   { background: rgba(255, 255, 255, 0.12); }
 }
 
 #btn-clutch {
@@ -720,8 +764,7 @@ input[type="range"].custom-slider::-moz-range-thumb {
 }
 
 #btn-trick.active-trick {
-    background: rgba(34, 34, 34, 0.9);
-    border-color: #fff;
+    background: rgba(255, 255, 255, 0.15);
     color: #fff;
 }
 
@@ -746,11 +789,11 @@ input[type="range"].custom-slider::-moz-range-thumb {
     overflow: hidden;
     padding: 0;
     display: block;
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid rgba(51, 51, 51, 0.85);
+    background: rgba(0, 0, 0, 0.28);
+    border: none;
     border-radius: 8px;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #gas-zone-high {
@@ -766,7 +809,7 @@ input[type="range"].custom-slider::-moz-range-thumb {
     font-weight: bold;
     color: #fff;
     z-index: 3;
-    border-bottom: 2px solid rgba(51, 51, 51, 0.85);
+    border-bottom: none;
     letter-spacing: 1px;
     background: transparent;
 }
@@ -789,11 +832,11 @@ input[type="range"].custom-slider::-moz-range-thumb {
 }
 
 #gas-zone-high.pressed {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 #gas-zone-low.pressed {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 #gas-fill {
@@ -802,15 +845,12 @@ input[type="range"].custom-slider::-moz-range-thumb {
     bottom: 0;
     width: 100%;
     height: 0%;
-    background: rgba(255, 100, 0, 0.3);
+    background: rgba(255, 100, 0, 0.25);
     z-index: 1;
     transition: height 0.05s linear;
     pointer-events: none;
 }
 
-/* ============================================================
-   ПАУЗА
-   ============================================================ */
 #pause-screen {
     position: fixed;
     top: 0;
@@ -843,12 +883,12 @@ input[type="range"].custom-slider::-moz-range-thumb {
     color: #fff;
     margin-bottom: 24px;
     letter-spacing: 1px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.3);
     padding: 8px 20px;
     border-radius: 8px;
-    border: 2px solid rgba(51, 51, 51, 0.85);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    border: none;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 #pause-screen .btn {
@@ -858,9 +898,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     margin-top: 12px;
 }
 
-/* ============================================================
-   GAME OVER
-   ============================================================ */
 #gameover {
     position: fixed;
     top: 0;
@@ -934,9 +971,11 @@ input[type="range"].custom-slider::-moz-range-thumb {
     #menu-title .line3 { font-size: 40px; }
     #menu-buttons .btn { width: 170px; height: 48px; font-size: 14px; }
     #btn-settings { width: 36px; height: 36px; font-size: 16px; top: 12px; right: 12px; }
-    #settings-title { font-size: 22px; margin-bottom: 20px; }
-    .setting-label { font-size: 13px; }
+    #settings-title { font-size: 22px; margin-bottom: 30px; }
+    .setting-label { font-size: 14px; }
     .setting-value { font-size: 12px; }
+    .slider-container { width: 55%; max-width: 170px; }
+    .toggle-btn { min-width: 90px; height: 36px; font-size: 12px; }
     #settings-credit { font-size: 10px; bottom: 12px; }
     #gameover h1 { font-size: 26px; }
     #gameover p { font-size: 13px; }
@@ -947,7 +986,11 @@ input[type="range"].custom-slider::-moz-range-thumb {
 </head>
 <body>
 
-<!-- ЭКРАН ЗАГРУЗКИ -->
+<div id="domain-lock">
+    <h1>ДОСТУП ЗАПРЕЩЁН</h1>
+    <p>Эта игра защищена доменной привязкой. Игра доступна только на официальном сайте разработчика.</p>
+</div>
+
 <div id="loading-screen">
     <img id="loading-wheel" src="wheel_bike.png" alt="">
     <div id="loading-progress-container">
@@ -957,7 +1000,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     <div id="loading-percent">0%</div>
 </div>
 
-<!-- МЕНЮ -->
 <div id="menu-screen" class="screen">
     <img id="menu-bg" src="menu.png" alt="">
     <img id="menu-bg-overlay" src="menu.png" alt="">
@@ -976,7 +1018,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     <button id="btn-settings" class="btn">⚙</button>
 </div>
 
-<!-- НАСТРОЙКИ -->
 <div id="settings-screen" class="screen">
     <img id="settings-bg" src="menu.png" alt="">
     <div id="settings-content">
@@ -984,22 +1025,24 @@ input[type="range"].custom-slider::-moz-range-thumb {
         <div id="settings-title">НАСТРОЙКИ</div>
         
         <div class="setting-block">
-            <div class="setting-label">
-                <span>ЛУЧИ</span>
-                <span class="setting-value" id="rays-value">50%</span>
-            </div>
+            <div class="setting-label">ЛУЧИ</div>
+            <div class="setting-value" id="rays-value">50%</div>
             <div class="slider-container">
                 <input type="range" class="custom-slider" id="slider-rays" min="0" max="100" value="50">
             </div>
         </div>
         
         <div class="setting-block">
-            <div class="setting-label">
-                <span>НОЧЬ</span>
-                <span class="setting-value" id="night-value">0%</span>
+            <div class="setting-label">НОЧЬ</div>
+            <div class="toggle-row">
+                <button id="btn-night-toggle" class="btn toggle-btn">ВЫКЛ</button>
             </div>
-            <div class="slider-container">
-                <input type="range" class="custom-slider" id="slider-night" min="0" max="100" value="0">
+        </div>
+        
+        <div class="setting-block">
+            <div class="setting-label">ПОГОДА</div>
+            <div class="toggle-row">
+                <button id="btn-weather-toggle" class="btn toggle-btn">ВЫКЛ</button>
             </div>
         </div>
         
@@ -1007,7 +1050,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     </div>
 </div>
 
-<!-- МАГАЗИН -->
 <div id="shop-screen" class="screen">
     <img id="shop-bg" src="menu.png" alt="">
     <div id="shop-content">
@@ -1039,7 +1081,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     </div>
 </div>
 
-<!-- ИГРА -->
 <div id="game-screen" class="screen">
     <canvas id="game-canvas"></canvas>
     <div id="speedometer">0 км/ч</div>
@@ -1058,7 +1099,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     </div>
 </div>
 
-<!-- ПАУЗА -->
 <div id="pause-screen">
     <h2>ПАУЗА</h2>
     <div id="pause-earnings">Заработано: 0 ₽</div>
@@ -1066,7 +1106,6 @@ input[type="range"].custom-slider::-moz-range-thumb {
     <button id="btn-pause-menu" class="btn">В МЕНЮ</button>
 </div>
 
-<!-- GAME OVER -->
 <div id="gameover">
     <h1>УПАЛ</h1>
     <p id="final-distance">Пройдено: 0 м</p>
@@ -1077,9 +1116,50 @@ input[type="range"].custom-slider::-moz-range-thumb {
 </div>
 
 <script>
-// ============================================================
-// ДАННЫЕ
-// ============================================================
+const ALLOWED_DOMAINS = [
+    'blashenny363-ux.github.io',
+    'localhost',
+    '127.0.0.1'
+];
+
+(function checkDomain() {
+    const currentHost = window.location.hostname.toLowerCase();
+    
+    let allowed = false;
+    for (const d of ALLOWED_DOMAINS) {
+        if (currentHost === d.toLowerCase()) {
+            allowed = true;
+            break;
+        }
+    }
+    
+    if (!allowed) {
+        document.body.innerHTML = '<div id="domain-lock" class="active"><h1>ДОСТУП ЗАПРЕЩЁН</h1><p>Эта игра защищена доменной привязкой. Игра доступна только на официальном сайте разработчика.</p></div>';
+        throw new Error('Domain not allowed');
+    }
+})();
+
+document.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 'a' || e.key === 'A' || e.keyCode === 65)) { e.preventDefault(); return false; }
+    return true;
+});
+
+document.addEventListener('selectstart', (e) => { e.preventDefault(); return false; });
+document.addEventListener('dragstart', (e) => { e.preventDefault(); return false; });
+
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) { e.preventDefault(); }
+}, { passive: false });
+
 const BIKES = [
     {
         id: 'stock', name: 'BSE', image: 'bike.png', price: 0, maxSpeed: 100, speedMultiplier: 1.0,
@@ -1153,30 +1233,22 @@ const ASSETS = {
     menuSound: 'menu_sound.mp3',
     bike7Sound: 'bike7.mp3',
     crash: '',
-    // Фоны
     menu1: 'menu.png',
     menu2: 'menu2.png',
     bg1: 'background.png',
     bg2: 'background2.png'
 };
 
-// ============================================================
-// РАНДОМНЫЙ ФОН МЕНЮ
-// ============================================================
 const menuBgList = [ASSETS.menu1, ASSETS.menu2];
 const chosenMenuBg = menuBgList[Math.floor(Math.random() * menuBgList.length)];
 
-// Фоны игры
 const gameBgList = [ASSETS.bg1, ASSETS.bg2];
 
-// ============================================================
-// СОХРАНЕНИЕ
-// ============================================================
 const SAVE_KEY = 'pitbike_save_v4';
 let save = { money: 0, ownedBikes: ['stock'], selectedBike: 'stock' };
 
-const SETTINGS_KEY = 'pitbike_settings_v1';
-let settings = { rays: 50, night: 0 };
+const SETTINGS_KEY = 'pitbike_settings_v2';
+let settings = { rays: 50, nightOn: false, weatherOn: false };
 
 function loadSave() {
     try {
@@ -1199,7 +1271,8 @@ function loadSettings() {
         if (raw) {
             const data = JSON.parse(raw);
             if (data.rays !== undefined) settings.rays = data.rays;
-            if (data.night !== undefined) settings.night = data.night;
+            if (data.nightOn !== undefined) settings.nightOn = data.nightOn;
+            if (data.weatherOn !== undefined) settings.weatherOn = data.weatherOn;
         }
     } catch (e) {}
 }
@@ -1210,15 +1283,11 @@ function persistSettings() {
 loadSave();
 loadSettings();
 
-// Применяем рандомный фон меню сразу
 document.getElementById('menu-bg').src = chosenMenuBg;
 document.getElementById('menu-bg-overlay').src = chosenMenuBg;
 document.getElementById('settings-bg').src = chosenMenuBg;
 document.getElementById('shop-bg').src = chosenMenuBg;
 
-// ============================================================
-// CANVAS
-// ============================================================
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 let W, H;
@@ -1231,9 +1300,6 @@ function resize() {
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 
-// ============================================================
-// ЗАГРУЗКА КАРТИНОК
-// ============================================================
 const images = { 
     bike: null, 
     wheel: null, 
@@ -1266,7 +1332,6 @@ function preloadAllImages() {
     PRELOAD_IMAGES.forEach(src => {
         const img = new Image();
         img.onload = () => {
-            // Запоминаем фоны отдельно
             if (src === 'background.png') images.background = img;
             if (src === 'background2.png') images.background2 = img;
             
@@ -1294,9 +1359,6 @@ function preloadAllImages() {
     });
 }
 
-// ============================================================
-// ЗВУК
-// ============================================================
 let engineSound = null;
 let engineStuntSound = null;
 let engineCarSound = null;
@@ -1556,9 +1618,6 @@ function stopBass() {
     document.getElementById('btn-bass').classList.remove('active-bass');
 }
 
-// ============================================================
-// СОСТОЯНИЕ
-// ============================================================
 const CONFIG = {
     gasRampUp: 800, gasRampDown: 400, brakeSpeed: 3.0, returnSpeed: 0.03,
     maxLeanBack: 90, maxLeanFwd: 25, fallAngle: 90, fallTime: 2500,
@@ -1587,8 +1646,12 @@ const CONFIG = {
     
     motionBlurAlpha: 0.35,
     
-    // ─── Смена фона игры каждые 700 метров ───
-    bgChangeDistance: 700
+    bgChangeDistance: 700,
+    
+    weatherCheckDistance: 400,
+    weatherChance: 0.4,
+    weatherDuration: 120000,
+    weatherDarkness: 0.5
 };
 
 const game = {
@@ -1608,9 +1671,13 @@ const game = {
     isTrick: false,
     rayOffset: 0,
     
-    // ─── Текущий фон игры ───
     currentBgIndex: 0,
-    nextBgChangeAt: 700   // при каком расстоянии меняем
+    nextBgChangeAt: 700,
+    
+    isRaining: false,
+    rainEndTime: 0,
+    nextWeatherCheckAt: 400,
+    rainDrops: []
 };
 
 const bike = { x: 0, y: 0, width: 400, height: 400, pivotX: 0.18, pivotY: 0.88 };
@@ -1665,8 +1732,8 @@ onButtonClick(document.getElementById('btn-settings'), () => {
     initSound();
     document.getElementById('slider-rays').value = settings.rays;
     document.getElementById('rays-value').textContent = settings.rays + '%';
-    document.getElementById('slider-night').value = settings.night;
-    document.getElementById('night-value').textContent = settings.night + '%';
+    updateNightButton();
+    updateWeatherButton();
     showScreen('settings-screen');
 });
 
@@ -1684,12 +1751,35 @@ sliderRays.addEventListener('change', () => {
     persistSettings();
 });
 
-const sliderNight = document.getElementById('slider-night');
-sliderNight.addEventListener('input', () => {
-    settings.night = parseInt(sliderNight.value);
-    document.getElementById('night-value').textContent = settings.night + '%';
+const btnNightToggle = document.getElementById('btn-night-toggle');
+
+function updateNightButton() {
+    if (settings.nightOn) {
+        btnNightToggle.textContent = 'ВКЛ';
+    } else {
+        btnNightToggle.textContent = 'ВЫКЛ';
+    }
+}
+
+onButtonClick(btnNightToggle, () => {
+    settings.nightOn = !settings.nightOn;
+    updateNightButton();
+    persistSettings();
 });
-sliderNight.addEventListener('change', () => {
+
+const btnWeatherToggle = document.getElementById('btn-weather-toggle');
+
+function updateWeatherButton() {
+    if (settings.weatherOn) {
+        btnWeatherToggle.textContent = 'ВКЛ';
+    } else {
+        btnWeatherToggle.textContent = 'ВЫКЛ';
+    }
+}
+
+onButtonClick(btnWeatherToggle, () => {
+    settings.weatherOn = !settings.weatherOn;
+    updateWeatherButton();
     persistSettings();
 });
 
@@ -2068,9 +2158,13 @@ function startGame() {
     game.isTrick = false;
     game.rayOffset = 0;
     
-    // Начинаем с первого фона
     game.currentBgIndex = 0;
     game.nextBgChangeAt = CONFIG.bgChangeDistance;
+    
+    game.isRaining = false;
+    game.rainEndTime = 0;
+    game.nextWeatherCheckAt = CONFIG.weatherCheckDistance;
+    game.rainDrops = [];
     
     btnTrick.classList.remove('active-trick');
     
@@ -2319,10 +2413,25 @@ function update(delta) {
     
     game.distance += game.speed * 0.05;
     
-    // ─── Смена фона игры каждые 700 метров ───
     if (game.distance >= game.nextBgChangeAt) {
         game.currentBgIndex++;
         game.nextBgChangeAt += CONFIG.bgChangeDistance;
+    }
+    
+    if (settings.weatherOn && !game.isRaining && game.distance >= game.nextWeatherCheckAt) {
+        if (Math.random() < CONFIG.weatherChance) {
+            game.isRaining = true;
+            game.rainEndTime = performance.now() + CONFIG.weatherDuration;
+        }
+        game.nextWeatherCheckAt += CONFIG.weatherCheckDistance;
+    }
+    
+    if (game.isRaining && performance.now() >= game.rainEndTime) {
+        game.isRaining = false;
+    }
+    
+    if (!settings.weatherOn && game.isRaining) {
+        game.isRaining = false;
     }
 
     if (isBike || isScooter) {
@@ -2385,14 +2494,12 @@ function draw() {
 function drawEverything(c) {
     c.clearRect(0, 0, W, H);
 
-    // ТЕКУЩИЙ ФОН ИГРЫ (меняется каждые 700 метров)
     const currentBg = getCurrentGameBg();
     
     if (currentBg) {
         const bgW = Math.max(W, currentBg.width);
         const bgH = H;
         
-        // Прокрутка фона
         const localOffset = game.worldOffset % bgW;
         let bgX = -localOffset;
         
@@ -2406,16 +2513,19 @@ function drawEverything(c) {
         c.fillRect(0, 0, W, H);
     }
 
-    // НОЧЬ
-    const nightAlpha = settings.night / 100;
+    const nightAlpha = settings.nightOn ? 0.75 : 0;
     if (nightAlpha > 0.01) {
-        c.fillStyle = `rgba(0, 5, 25, ${nightAlpha * 0.85})`;
+        c.fillStyle = `rgba(0, 5, 25, ${nightAlpha})`;
         c.fillRect(0, 0, W, H);
     }
 
-    // ЛУЧИ
+    if (game.isRaining) {
+        c.fillStyle = `rgba(30, 40, 60, ${CONFIG.weatherDarkness})`;
+        c.fillRect(0, 0, W, H);
+    }
+
     const raysValue = settings.rays / 100;
-    if (raysValue > 0.01) {
+    if (raysValue > 0.01 && !game.isRaining) {
         c.globalCompositeOperation = 'lighten';
         c.fillStyle = `rgba(255, 240, 200, ${raysValue * 0.25})`;
         c.fillRect(0, 0, W, H);
@@ -2456,7 +2566,39 @@ function drawEverything(c) {
         c.restore();
     }
 
-    // ДЫМ
+    if (game.isRaining) {
+        c.strokeStyle = 'rgba(180, 200, 230, 0.5)';
+        c.lineWidth = 1.5;
+        c.lineCap = 'round';
+        
+        if (!game.rainDrops) game.rainDrops = [];
+        for (let i = 0; i < 5; i++) {
+            game.rainDrops.push({
+                x: Math.random() * W,
+                y: -20,
+                speed: 15 + Math.random() * 10,
+                length: 15 + Math.random() * 15
+            });
+        }
+        
+        for (let i = game.rainDrops.length - 1; i >= 0; i--) {
+            const drop = game.rainDrops[i];
+            c.beginPath();
+            c.moveTo(drop.x, drop.y);
+            c.lineTo(drop.x - 2, drop.y + drop.length);
+            c.stroke();
+            
+            drop.y += drop.speed;
+            drop.x -= 0.5;
+            
+            if (drop.y > H + 20) {
+                game.rainDrops.splice(i, 1);
+            }
+        }
+    } else {
+        game.rainDrops = [];
+    }
+
     for (const p of game.smoke) {
         c.fillStyle = `rgba(200, 200, 200, ${p.life * 0.4})`;
         c.beginPath();
@@ -2469,7 +2611,6 @@ function drawEverything(c) {
     const isCar = game.currentType === 'car';
     const bd = game.currentBikeData;
 
-    // КОЛЁСА
     if (!isCar && images.bikeWheel && bd && bd.hasWheels) {
         c.save();
         c.translate(pivotCanvasX, pivotCanvasY);
@@ -2516,7 +2657,6 @@ function drawEverything(c) {
         c.restore();
     }
 
-    // КУЗОВ
     c.save();
     c.translate(pivotCanvasX, pivotCanvasY);
     c.rotate(game.bikeAngle * Math.PI / 180);
@@ -2547,7 +2687,6 @@ function drawEverything(c) {
 
     c.restore();
 
-    // ИСКРЫ
     for (const s of game.carSparks) {
         c.globalAlpha = s.life * 0.4;
         c.fillStyle = s.color;
